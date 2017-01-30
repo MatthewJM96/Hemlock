@@ -134,6 +134,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Hemlock.cpp" />
+    <ClCompile Include="src\camera\BasicCamera.cpp" />
     <ClCompile Include="src\graphics\GLSLProgram.cpp" />
     <ClCompile Include="src\graphics\Window.cpp" />
     <ClCompile Include="src\script\meh.cpp" />
@@ -142,6 +143,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\camera\BasicCamera.h" />
+    <ClInclude Include="include\Event.hpp" />
     <ClInclude Include="include\graphics\GLSLProgram.h" />
     <ClInclude Include="include\graphics\ShaderManager.h" />
     <ClInclude Include="include\graphics\Window.h" />
