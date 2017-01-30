@@ -2,8 +2,6 @@
 
 #include <cstdint>
 
-#include <glm/glm.hpp>
-
 typedef int8_t i8; ///< 8-bit signed integer
 typedef int16_t i16; ///< 16-bit signed integer
 typedef int32_t i32; ///< 32-bit signed integer
