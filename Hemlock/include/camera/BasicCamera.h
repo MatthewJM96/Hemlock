@@ -1,0 +1,72 @@
+#pragma once
+
+#ifndef HEMLOCK_USING_PCH
+#include "types.h"
+#include <glm\glm.hpp>
+#include "Event.hpp"
+#endif
+
+#include "graphics\Window.h"
+
+namespace hemlock {
+    namespace camera {
+        class BasicCamera {
+        public:
+            BasicCamera() {};
+            ~BasicCamera() {};
+            
+            void attachToWindow(hg::Window* window);
+
+            void update();
+
+            void setAspectRatio(f32 aspectRatio);
+            void setFov(f32 fov);
+            void setNearClipping(f32 nearClipping);
+            void setFarClipping(f32 farClipping);
+            void setClipping(f32 nearClipping, f32 farClipping);
+            void setPosition(glm::f32vec3 position);
+            void setDirection(glm::f32vec3 direction);
+            void setRight(glm::f32vec3 right);
+            void setUp(glm::f32vec3 up);
+
+            void offsetPosition(glm::f32vec3 offsets);
+            void offsetPosition(f32 xOff, f32 yOff, f32 zOff);
+
+            void applyRotation(glm::f32quat quaternion);
+            void rotateFromMouse(f32 dx, f32 dy, f32 speed);
+            void rollFromMouse(f32 dx, f32 speed);
+
+            f32          getAspectRatio()          const { return m_aspectRatio; };
+            f32          getFov()                  const { return m_fov; };
+            f32          getNearClipping()         const { return m_nearClipping; };
+            f32          getFarClipping()          const { return m_farClipping; };
+            glm::f32vec3 getPosition()             const { return m_position; };
+            glm::f32vec3 getDirection()            const { return m_direction; };
+            glm::f32vec3 getRight()                const { return m_right; };
+            glm::f32vec3 getUp()                   const { return m_up; };
+            glm::f32mat4 getProjectionMatrix()     const { return m_projectionMatrix; };
+            glm::f32mat4 getViewMatrix()           const { return m_viewMatrix; };
+            glm::f32mat4 getViewProjectionMatrix() const { return m_viewProjectionMatrix; };
+        private:
+            void handleWindowResize(h::Sender window, hg::OnResizeEvent event);
+
+            f32 m_aspectRatio        = 4.0f/3.0f;
+            f32 m_fov                = 90.0f;
+            f32 m_nearClipping       = 0.1f;
+            f32 m_farClipping        = 10000.0f;
+
+            glm::f32vec3 m_position  = glm::f32vec3(0.0f);
+            glm::f32vec3 m_direction = glm::f32vec3(1.0f, 0.0f, 0.0f);
+            glm::f32vec3 m_right     = glm::f32vec3(0.0f, 0.0f, 1.0f);
+            glm::f32vec3 m_up        = glm::f32vec3(0.0f, 1.0f, 0.0f);
+
+            glm::f32mat4 m_viewMatrix;
+            glm::f32mat4 m_projectionMatrix;
+            glm::f32mat4 m_viewProjectionMatrix;
+
+            bool m_viewChanged = true;
+            bool m_projectionChanged = true;
+        };
+    }
+}
+namespace hcam = hemlock::camera;
