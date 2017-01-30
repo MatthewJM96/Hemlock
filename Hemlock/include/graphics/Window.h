@@ -31,17 +31,22 @@ namespace hemlock {
             SwapInterval swapInterval;
         };
 
-        const WindowSettings defaultWindowSettings = { "Hemlock Window", {800, 600}, 0, false, false, false, SwapInterval::V_SYNC };
+        struct OnResizeEvent {
+            WindowDimensions before;
+            WindowDimensions now;
+        };
+
+        const WindowSettings DEFAULT_WINDOW_SETTINGS = { "Hemlock Window", {800, 600}, 0, false, false, false, SwapInterval::V_SYNC };
 
         class Window {
         public:
-            Window(WindowSettings settings) : m_settings(settings), m_window(nullptr), m_aspectRatio(nullptr) {
+            Window(WindowSettings settings) : m_settings(settings), m_window(nullptr), m_aspectRatioString(nullptr) {
                 init();
             }
-            Window() : Window(defaultWindowSettings) {}
-            Window(char* name, ui32 width, ui32 height, ui8 screenIndex = defaultWindowSettings.screenIndex, bool fullscreen = defaultWindowSettings.fullscreen,
-                    bool resizable = defaultWindowSettings.resizable, bool borderless = defaultWindowSettings.borderless,
-                    SwapInterval swapInterval = defaultWindowSettings.swapInterval)
+            Window() : Window(DEFAULT_WINDOW_SETTINGS) {}
+            Window(char* name, ui32 width, ui32 height, ui8 screenIndex = DEFAULT_WINDOW_SETTINGS.screenIndex, bool fullscreen = DEFAULT_WINDOW_SETTINGS.fullscreen,
+                    bool resizable = DEFAULT_WINDOW_SETTINGS.resizable, bool borderless = DEFAULT_WINDOW_SETTINGS.borderless,
+                    SwapInterval swapInterval = DEFAULT_WINDOW_SETTINGS.swapInterval)
                 : Window(WindowSettings{ name, {width, height}, screenIndex, fullscreen, resizable, borderless, swapInterval }) {}
             ~Window() {
                 SDL_GL_DeleteContext(m_context);
@@ -62,8 +67,11 @@ namespace hemlock {
             ui32 getHeight() {
                 return m_settings.dimensions.height;
             }
-            char* getAspectRatio() {
-                return m_aspectRatio;
+            char* getAspectRatioAsString() {
+                return m_aspectRatioString;
+            }
+            f32 getAspectRatio() {
+                return getWidth() / getHeight();
             }
             bool isFullscreen() {
                 return m_settings.fullscreen;
@@ -78,14 +86,27 @@ namespace hemlock {
                 return m_settings.swapInterval;
             }
 
+            void setName(char* name);
+            void setDimensions(WindowDimensions dimensions);
+            void setWidth(ui32 width);
+            void setHeight(ui32 height);
+            void setFullscreen(bool fullscreen);
+            void setResizable(bool resizable);
+            void setBorderless(bool borderless);
+            void setSwapInterval(SwapInterval swapInterval);
+
             void sync();
+
+            Event<> onFullscreen;
+            Event<> onExitFullscreen;
+            Event<OnResizeEvent> onResize;
         private:
             void init();
             void getAllowedDisplayResolutions();
             void calculateAspectRatio();
 
             WindowSettings m_settings;
-            char* m_aspectRatio;
+            char* m_aspectRatioString;
             SDL_Window* m_window;
             SDL_GLContext m_context;
             std::map<ui8, std::vector<WindowDimensions>> m_allowedResolutions;
