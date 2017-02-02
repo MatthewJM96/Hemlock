@@ -55,7 +55,10 @@ bool hg::GLSLProgram::addShader(hg::ShaderInfo shader) {
     }
 
     char* buffer;
-    hio::readFileToBuffer(shader.filepath, buffer);
+    if (!hio::readFileToBuffer(shader.filepath, buffer)) {
+        printf("Could not find shader: %s!", shader.filepath);
+        return false;
+    }
 
     glShaderSource(shaderId, 1, &buffer, nullptr);
     glCompileShader(shaderId);
@@ -101,7 +104,7 @@ bool hg::GLSLProgram::link() {
     }
 
     if (!m_idVS || !m_idFS) {
-        puts("Both a vertex and fragment shader must be provided to link!");
+        puts("Both a vertex and fragment shader must be provided to link!\n");
         return false;
     }
 
@@ -165,7 +168,7 @@ GLuint hg::GLSLProgram::getUniformLocation(char* name) {
     }
 
     GLint location = glGetUniformLocation(m_id, name);
-    if (!location) {
+    if (location < 0) {
         printf("Uniform %s not found in shader!", name);
     }
     return location;
