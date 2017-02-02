@@ -1,1 +1,0 @@
-io.write(string.format("We're running LUA version %s!\n", _VERSION));
