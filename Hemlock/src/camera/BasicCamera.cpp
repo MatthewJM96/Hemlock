@@ -6,7 +6,7 @@
 #include <glm\gtc\quaternion.hpp>
 
 void hcam::BasicCamera::attachToWindow(hg::Window* window) {
-    window->onResize += makeDelegate(*this, &hcam::BasicCamera::handleWindowResize);
+    window->onWindowResize += makeDelegate(*this, &hcam::BasicCamera::handleWindowResize);
 }
 
 void hcam::BasicCamera::update() {
@@ -101,8 +101,8 @@ void hcam::BasicCamera::rollFromMouse(f32 dx, f32 speed) {
     applyRotation(forward);
 }
 
-void hcam::BasicCamera::handleWindowResize(h::Sender window, hg::OnResizeEvent event) {
-    f32 newAspectRatio = event.now.width / event.now.height;
+void hcam::BasicCamera::handleWindowResize(h::Sender window, hg::ResizeEvent event) {
+    f32 newAspectRatio = (f32)event.now.width / (f32)event.now.height;
     if (getAspectRatio() != newAspectRatio) {
         setAspectRatio(newAspectRatio);
     }
