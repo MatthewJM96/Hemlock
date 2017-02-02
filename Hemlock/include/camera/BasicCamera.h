@@ -48,7 +48,7 @@ namespace hemlock {
             glm::f32mat4 getViewMatrix()           const { return m_viewMatrix; };
             glm::f32mat4 getViewProjectionMatrix() const { return m_viewProjectionMatrix; };
         private:
-            void handleWindowResize(h::Sender window, hg::OnResizeEvent event);
+            void handleWindowResize(h::Sender window, hg::ResizeEvent event);
 
             f32 m_aspectRatio        = 4.0f/3.0f;
             f32 m_fov                = 90.0f;
