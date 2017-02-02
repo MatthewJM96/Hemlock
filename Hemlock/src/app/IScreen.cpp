@@ -17,10 +17,10 @@ void happ::IScreen::dispose() {
     m_name = nullptr;
 }
 
-void happ::IScreen::start() {
+void happ::IScreen::start(TimeData time) {
     m_state = ScreenState::RUNNING;
 }
 
-void happ::IScreen::end() {
+void happ::IScreen::end(TimeData time) {
     m_state = ScreenState::NONE;
 }
