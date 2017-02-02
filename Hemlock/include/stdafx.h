@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <map>
+#include <unordered_map>
 
 #include <string>
 
@@ -13,7 +14,9 @@
 #include <sdl\SDL.h>
 #include <gl\glew.h>
 
-#include <glm/glm.hpp>
+#include <glm\glm.hpp>
+
+#include <FreeImage.h>
 
 #include "types.h"
 
