@@ -14,6 +14,11 @@ typedef uint64_t ui64; ///< 64-bit unsigned integer
 typedef float f32; ///< 32-bit floating point value (single)
 typedef double f64; ///< 64-bit floating point value (double)
 
+struct TimeData {
+    f64 total;
+    f64 frame;
+};
+
 #define M_TAU  6.28318530717958647692
 #define M_TAUF 6.2831853f
 #define M_PI   M_TAU / 2
