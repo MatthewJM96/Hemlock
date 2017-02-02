@@ -10,7 +10,8 @@ namespace hemlock {
         };
 
         class InputManager {
-
+        public:
+            void dispose() {}
         };
     }
 }
