@@ -2,7 +2,9 @@
 
 #include "graphics\Window.h"
 
-void hg::Window::init() {
+hg::WindowError hg::Window::init() {
+    if (m_initialised) return WindowError::NONE;
+
     getAllowedDisplayResolutions();
     calculateAspectRatio();
 
@@ -19,17 +21,17 @@ void hg::Window::init() {
 
     m_window = SDL_CreateWindow(getName(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, getWidth(), getHeight(), flags);
     if (m_window == nullptr) {
-        puts("Oh bugger, couldn't make a window!");
+        return WindowError::SDL_WINDOW;
     }
 
     m_context = SDL_GL_CreateContext(m_window);
     if (m_context == NULL) {
-        puts("Gosh darn, couldn't make a GL Context!");
+        return WindowError::SDL_GL_CONTEXT;
     }
 
     GLenum error = glewInit();
     if (error != GLEW_OK) {
-        puts("Well I'll be, couldn't initialise Glew!");
+        return WindowError::GLEW_INITIALISATION;
     }
 
     printf("*** OpenGL Version: %s ***\n", glGetString(GL_VERSION));
@@ -41,6 +43,28 @@ void hg::Window::init() {
     } else {
         SDL_GL_SetSwapInterval(0);
     }
+
+    m_initialised = true;
+    return WindowError::NONE;
+}
+
+void hg::Window::dispose() {
+    if (!m_initialised) return;
+    m_initialised = false;
+
+    SDL_GL_DeleteContext(m_context);
+    m_context = nullptr;
+
+    SDL_DestroyWindow(m_window);
+    m_window = nullptr;
+    
+    delete m_aspectRatioString;
+    m_aspectRatioString = nullptr;
+
+    delete m_settings.name;
+    m_settings.name = nullptr;
+
+    WindowDimensionMap().swap(m_allowedResolutions);
 }
 
 void hg::Window::getAllowedDisplayResolutions() {
@@ -86,7 +110,7 @@ void hg::Window::setDimensions(WindowDimensions dimensions) {
     WindowDimensions temp = m_settings.dimensions;
     m_settings.dimensions = dimensions;
     SDL_SetWindowSize(m_window, dimensions.width, dimensions.height);
-    onResize({ temp, dimensions });
+    onWindowResize({ temp, dimensions });
 }
 
 void hg::Window::setWidth(ui32 width) {
@@ -102,10 +126,10 @@ void hg::Window::setFullscreen(bool fullscreen) {
     m_settings.fullscreen = fullscreen;
     if (fullscreen) {
         SDL_SetWindowFullscreen(m_window, SDL_WINDOW_FULLSCREEN);
-        onFullscreen();
+        onWindowFullscreen();
     } else {
         SDL_SetWindowFullscreen(m_window, 0);
-        onExitFullscreen();
+        onWindowFullscreenExit();
     }
 }
 
@@ -121,11 +145,27 @@ void hg::Window::setBorderless(bool borderless) {
     SDL_SetWindowBordered(m_window, (SDL_bool)!borderless);
 }
 
+void hg::Window::setMaximised(bool maximised) {
+    if (m_settings.maximised == maximised) return;
+    m_settings.maximised = maximised;
+    if (maximised) {
+        SDL_MaximizeWindow(m_window);
+        onWindowMaximised();
+    } else {
+        SDL_MinimizeWindow(m_window);
+        onWindowMinimised();
+    }
+}
+
 void hg::Window::setSwapInterval(hg::SwapInterval swapInterval) {
     if (m_settings.swapInterval == swapInterval) return;
     int vsync = swapInterval == hg::SwapInterval::V_SYNC ? 1 : 0;
     m_settings.swapInterval = swapInterval;
     SDL_GL_SetSwapInterval(vsync);
+}
+
+void hg::Window::requestClose() {
+    onWindowClose();
 }
 
 void hg::Window::sync() {
