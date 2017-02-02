@@ -24,7 +24,7 @@ namespace hemlock {
 
         // TODO(Matthew): Figure out if certain bits (looking at glEnableVertexAttribArray) can't be so-generalised.
         // TODO(Matthew): Make class so we can properly dispose of VBO and EBO.
-        GLuint createVAO(VertexData vertexData, VertexDataVolatility volatility = VertexDataVolatility::STATIC) {
+        inline GLuint createVAO(VertexData vertexData, VertexDataVolatility volatility = VertexDataVolatility::STATIC) {
             GLuint vao;
             glGenVertexArrays(1, &vao);
             glBindVertexArray(vao);
