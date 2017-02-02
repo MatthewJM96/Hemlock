@@ -2,14 +2,30 @@
 
 #include "app\IScreen.h"
 #include "graphics\Window.h"
+#include "ui\InputDispatcher.h"
+#include "ui\InputManager.h"
 
 #include "app\IApp.h"
+
+void happ::IApp::init() {
+    m_window = new hg::Window();
+    m_inputManager = new hui::InputManager();
+    hui::InputDispatcher::getInstance()->init(m_window, m_inputManager);
+
+    prepareScreens();
+}
 
 void happ::IApp::dispose() {
     disposeScreens();
     m_currentScreen = nullptr;
 
     m_window->dispose();
+    delete m_window;
+    m_window = nullptr;
+
+    m_inputManager->dispose();
+    delete m_inputManager;
+    m_inputManager = nullptr;
 }
 
 void happ::IApp::quit() {
