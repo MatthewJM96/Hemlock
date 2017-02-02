@@ -146,10 +146,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="App.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="MainMenuScreen.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="App.h" />
     <ClInclude Include="MainMenuScreen.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>

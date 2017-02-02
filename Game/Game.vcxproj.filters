@@ -16,6 +16,9 @@
     <Filter Include="Source Files\Screens">
       <UniqueIdentifier>{4e7de74d-c75d-4315-9fad-5408ff3e6fb3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Screens">
+      <UniqueIdentifier>{63bd8d64-8780-4e60-888a-8ea95f5d4ded}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">
@@ -24,13 +27,19 @@
     <ClCompile Include="MainMenuScreen.cpp">
       <Filter>Source Files\Screens</Filter>
     </ClCompile>
+    <ClCompile Include="App.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="MainMenuScreen.h">
-      <Filter>Source Files\Screens</Filter>
+      <Filter>Header Files\Screens</Filter>
+    </ClInclude>
+    <ClInclude Include="App.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
