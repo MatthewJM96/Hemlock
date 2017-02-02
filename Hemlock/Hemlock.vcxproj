@@ -163,6 +163,7 @@
     <ClCompile Include="src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\Timing.cpp" />
     <ClCompile Include="src\ui\InputDispatcher.cpp" />
     <ClCompile Include="src\ui\InputManager.cpp" />
   </ItemGroup>
@@ -180,6 +181,7 @@
     <ClInclude Include="include\io\IOHelpers.hpp" />
     <ClInclude Include="include\maths\TweeningMaths.hpp" />
     <ClInclude Include="include\stdafx.h" />
+    <ClInclude Include="include\Timing.h" />
     <ClInclude Include="include\types.h" />
     <ClInclude Include="include\ui\InputDispatcher.h" />
     <ClInclude Include="include\ui\InputManager.h" />
