@@ -32,6 +32,9 @@ h::Event<>                           hui::InputDispatcher::onKeyboardFocusGained
 
 h::Event<>                           hui::InputDispatcher::onQuit(nullptr);
 
+h::RPriorityEvent<i32>               hui::InputDispatcher::onRPriorityEventTest(nullptr);
+h::PriorityEvent<>                   hui::InputDispatcher::onPriorityEventTest(nullptr);
+
 void hui::InputDispatcher::init(hg::Window* window, hui::InputManager* manager) {
     if (m_initialised) return;
     m_initialised = true;
@@ -66,6 +69,8 @@ i32 hui::InputDispatcher::handleInputEvent(void* data, SDL_Event* event) {
             } else {
                 onMouseButtonUp(mbe);
             }
+            onRPriorityEventTest();
+            onPriorityEventTest();
             break;
         case SDL_MOUSEMOTION:
             MouseMoveEvent mme;

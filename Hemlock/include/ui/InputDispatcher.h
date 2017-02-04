@@ -65,6 +65,9 @@ namespace hemlock {
             static Event<>                      onKeyboardFocusGained;
 
             static Event<>                      onQuit;
+
+            static RPriorityEvent<i32>          onRPriorityEventTest;
+            static  PriorityEvent<>              onPriorityEventTest;
         private:
             InputDispatcher() :
                 m_window(nullptr) {};
