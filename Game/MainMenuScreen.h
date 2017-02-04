@@ -16,6 +16,7 @@ public:
 private:
     hcam::BasicCamera m_camera;
     hg::GLSLProgram   m_shader;
-    GLuint            m_vao;
-    hg::VertexData    m_vData = {};
+    GLuint            m_vao1;
+    GLuint            m_vao2;
+    GLuint            m_texture;
 };
