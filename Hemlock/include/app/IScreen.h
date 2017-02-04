@@ -38,7 +38,7 @@ namespace hemlock {
 
             void setNextScreen(char* name) { m_next = name; }
             void setPrevScreen(char* name) { m_prev = name; }
-        private:
+        protected:
             bool        m_initialised;
             ScreenState m_state;
             char*       m_name;
