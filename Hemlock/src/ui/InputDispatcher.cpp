@@ -109,6 +109,7 @@ i32 hui::InputDispatcher::handleInputEvent(void* data, SDL_Event* event) {
                 default:
                     return 1;
             }
+            break;
         default:
             return 1;
     }
