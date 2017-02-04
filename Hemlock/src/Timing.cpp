@@ -34,7 +34,7 @@ f64 h::FpsLimiter::end() {
 
     f64 timeThisFrame = (f64)(SDL_GetTicks() - m_startTime);
     if (MILLISECONDS / m_maxFps > timeThisFrame) {
-        SDL_Delay((MILLISECONDS / m_fps) - timeThisFrame);
+        SDL_Delay((ui32)((MILLISECONDS / m_maxFps) - timeThisFrame));
     }
 
     return m_fps;
