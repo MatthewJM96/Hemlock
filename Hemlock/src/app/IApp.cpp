@@ -8,6 +8,10 @@ void happ::IApp::init() {
     if (m_initialised) return;
     m_initialised = true;
 
+    SDL_Init(SDL_INIT_EVERYTHING);
+    SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
     m_window = new hg::Window();
     if (m_window->init() != hg::WindowError::NONE) {
         puts("Window could not be initialised...\n");
@@ -42,10 +46,6 @@ void happ::IApp::dispose() {
 }
 
 void happ::IApp::run() {
-    SDL_Init(SDL_INIT_EVERYTHING);
-    SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
     init();
 
     while (!m_shouldQuit) {
@@ -64,7 +64,7 @@ void happ::IApp::run() {
         }
 
         m_window->sync();
-
+        
         m_fpsLimiter->end();
     }
 }
