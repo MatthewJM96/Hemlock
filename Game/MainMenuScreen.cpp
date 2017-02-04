@@ -3,6 +3,7 @@
 #include "MainMenuScreen.h"
 
 void MainMenuScreen::init(char* name) {
+    if (m_initialised) return;
     IScreen::init(name);
 
     m_camera.setPosition(glm::f32vec3(0.0f, 0.0f, -1.5f));
@@ -36,9 +37,17 @@ void MainMenuScreen::init(char* name) {
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
-void MainMenuScreen::update(TimeData time) {
+void MainMenuScreen::dispose() {
+    if (!m_initialised) return;
+
     m_shader.dispose();
     glDeleteVertexArrays(1, &m_vao);
+
+    IScreen::dispose();
+}
+
+void MainMenuScreen::update(TimeData time) {
+    // Empty
 }
 
 void MainMenuScreen::draw(TimeData time) {
