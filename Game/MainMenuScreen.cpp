@@ -4,6 +4,9 @@
 
 #include <IL\il.h>
 
+#include <io\ImageLoader.h>
+#include <graphics\Texture.h>
+
 void MainMenuScreen::init(char* name) {
     if (m_initialised) return;
     IScreen::init(name);
@@ -19,45 +22,20 @@ void MainMenuScreen::init(char* name) {
     m_shader.link();
 
     //GLuint mvpLoc = shader->getUniformLocation("MVP");
+    
+    m_texture1 = hg::Texture::load("textures/container.jpg", true);
+    m_texture2 = hg::Texture::load("textures/anfo.png", true);
 
-    f32 ratio = m_camera.getAspectRatio(); // Cheap trick to make image square
     hg::Vertex3D<f32> vertices[4] = {
-        {  0.06f,  0.06f * ratio, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f },  // Top Right
-        {  0.06f, -0.06f * ratio, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f },  // Bottom Right
-        { -0.06f, -0.06f * ratio, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f },  // Bottom Left
-        { -0.06f,  0.06f * ratio, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f }   // Top Left 
+        { 0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f },  // Top Right
+        { 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f },  // Bottom Right
+        { -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f },  // Bottom Left
+        { -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f }   // Top Left 
     };
-    GLuint* indices = new GLuint[6] {
+    GLuint* indices = new GLuint[6]{
         0, 1, 3,  // First Triangle
         1, 2, 3   // Second Triangle
     };
-
-    //////////////////////////////////////////////////////////////
-    // TODO(Matthew): Replace current image loading with DevIL. //
-    //     Also, figure out ILUT and utilise as it likely hand- //
-    //     -les metadata better than we could. Finally, make a  //
-    //     class/function that handles uploading mesh data AND  //
-    //     preparing the textures associated.                   //
-    //////////////////////////////////////////////////////////////
-
-    //hio::BitmapResource bmp = hio::load("textures/uvtemplate.bmp", hio::ImageIOFormat::RAW);
-    ILuint image;
-    ilGenImages(1, &image);
-    ilBindImage(image);
-
-    ilLoadImage("textures/anfo.png");
-
-    ILuint width = ilGetInteger(IL_IMAGE_WIDTH);
-    ILuint height = ilGetInteger(IL_IMAGE_HEIGHT);
-    ILubyte* data = ilGetData();
-    
-    glGenTextures(1, &m_texture);
-    glBindTexture(GL_TEXTURE_2D, m_texture);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
 
     hg::MeshData3D<f32> m_vData = {};
     m_vData.vertices = &vertices[0];
@@ -66,11 +44,6 @@ void MainMenuScreen::init(char* name) {
     m_vData.indexCount = 6;
 
     m_vao1 = hg::createVAO(m_vData);
-    
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     //hg::Vertex3D<f32> vertices2[4] = {
     //    {  1.5f,  1.5f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f },  // Top Right
@@ -122,7 +95,14 @@ void MainMenuScreen::draw(TimeData time) {
     //glm::f32mat4 mvp = camera->getViewProjectionMatrix();
     //glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, &mvp[0][0]);
 
-    glBindTexture(GL_TEXTURE_2D, m_texture);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_texture1);
+    glUniform1i(m_shader.getUniformLocation("tex1"), 0);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_texture2);
+    glUniform1i(m_shader.getUniformLocation("tex2"), 1);
+
+
     glBindVertexArray(m_vao1);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     //glBindVertexArray(m_vao2);

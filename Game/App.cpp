@@ -9,6 +9,8 @@ void App::init() {
     if (m_initialised) return;
     IApp::init();
 
+    m_window->setDimensions({ 640, 320 });
+
     const auto& dispatcher = hui::InputDispatcher::getInstance();
     dispatcher->onMouseButtonDown += h::makeDelegate(*this, &App::handleButtonDown);
     dispatcher->onMouseMove += h::makeDelegate(*this, &App::handleMouseMovement);

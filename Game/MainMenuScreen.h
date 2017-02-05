@@ -18,5 +18,6 @@ private:
     hg::GLSLProgram   m_shader;
     GLuint            m_vao1;
     GLuint            m_vao2;
-    GLuint            m_texture;
+    GLuint            m_texture1;
+    GLuint            m_texture2;
 };
