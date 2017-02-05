@@ -55,7 +55,7 @@ bool hg::GLSLProgram::addShader(hg::ShaderInfo shader) {
     }
 
     char* buffer;
-    if (!hio::readFileToBuffer(shader.filepath, buffer)) {
+    if (!hio::File::read(shader.filepath, buffer)) {
         printf("Could not find shader: %s!", shader.filepath);
         return false;
     }
