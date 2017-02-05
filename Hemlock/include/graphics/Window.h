@@ -5,6 +5,10 @@
 #endif
 
 namespace hemlock {
+    namespace ui {
+        class InputDispatcher;
+    }
+
     namespace graphics {
         // Events:
         //   WindowClose
@@ -54,8 +58,9 @@ namespace hemlock {
         };
 
         const WindowSettings DEFAULT_WINDOW_SETTINGS = { "Hemlock Window", {800, 600}, 0, false, true, false, false, SwapInterval::V_SYNC };
-
+        
         class Window {
+            friend class hemlock::ui::InputDispatcher;
             typedef std::map<ui8, std::vector<WindowDimensions>> WindowDimensionMap;
         public:
             Window(WindowSettings settings) : m_settings(settings), m_window(nullptr), m_aspectRatioString(nullptr) {}
@@ -125,6 +130,8 @@ namespace hemlock {
             Event<>            onWindowFullscreen;
             Event<>            onWindowFullscreenExit;
             Event<ResizeEvent> onWindowResize;
+        protected:
+            void windowDimensionsHaveChanged(ui32 width, ui32 height);
         private:
             void getAllowedDisplayResolutions();
             void calculateAspectRatio();

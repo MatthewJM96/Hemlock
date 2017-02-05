@@ -67,6 +67,14 @@ void hg::Window::dispose() {
     WindowDimensionMap().swap(m_allowedResolutions);
 }
 
+void hg::Window::windowDimensionsHaveChanged(ui32 width, ui32 height) {
+    glViewport(0, 0, width, height);
+
+    WindowDimensions temp = m_settings.dimensions;
+    m_settings.dimensions = { width, height };
+    onWindowResize({ temp, m_settings.dimensions });
+}
+
 void hg::Window::getAllowedDisplayResolutions() {
     SDL_DisplayMode mode;
     ui32 displayCount = SDL_GetNumVideoDisplays();
@@ -107,10 +115,9 @@ void hg::Window::setName(char* name) {
 
 void hg::Window::setDimensions(WindowDimensions dimensions) {
     if (m_settings.dimensions == dimensions) return;
-    WindowDimensions temp = m_settings.dimensions;
-    m_settings.dimensions = dimensions;
     SDL_SetWindowSize(m_window, dimensions.width, dimensions.height);
-    onWindowResize({ temp, dimensions });
+
+    windowDimensionsHaveChanged(dimensions.width, dimensions.height);
 }
 
 void hg::Window::setWidth(ui32 width) {

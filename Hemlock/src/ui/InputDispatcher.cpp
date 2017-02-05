@@ -38,7 +38,7 @@ void hui::InputDispatcher::init(hg::Window* window, hui::InputManager* manager) 
     m_window = window;
     m_manager = manager;
 
-    SDL_SetEventFilter(hui::InputDispatcher::handleInputEvent, nullptr);
+    SDL_SetEventFilter(hui::InputDispatcher::handleInputEvent, (void*)this);
     SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
 }
 
@@ -52,6 +52,7 @@ void hui::InputDispatcher::dispose() {
 
 // Return 1 for unkown input, 0 for handled input.
 i32 hui::InputDispatcher::handleInputEvent(void* data, SDL_Event* event) {
+    InputDispatcher* inputDispatcher = static_cast<InputDispatcher*>(data);
     switch (event->type) {
         // TODO(Matthew): Update InputManager with changes.
         case SDL_MOUSEBUTTONUP:
@@ -106,6 +107,8 @@ i32 hui::InputDispatcher::handleInputEvent(void* data, SDL_Event* event) {
                 case SDL_WINDOWEVENT_FOCUS_LOST:
                     onKeyboardFocusLost();
                     break;
+                case SDL_WINDOWEVENT_RESIZED:
+                    inputDispatcher->m_window->windowDimensionsHaveChanged(event->window.data1, event->window.data2);
                 default:
                     return 1;
             }
