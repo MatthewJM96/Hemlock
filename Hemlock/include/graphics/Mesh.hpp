@@ -29,7 +29,7 @@ namespace hemlock {
         // TODO(Matthew): Make class so we can properly dispose of VBO and EBO.
         template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
         inline GLuint createVAO(MeshData3D<FXX> vertexData, VertexDataVolatility volatility = VertexDataVolatility::STATIC) {
-            if (!vertexData.vertices || !vertexData.indices) return 0;
+            if (!vertexData.vertices) return 0;
 
             GLuint vao;
             glGenVertexArrays(1, &vao);
@@ -39,11 +39,13 @@ namespace hemlock {
             glGenBuffers(1, &vbo);
             glBindBuffer(GL_ARRAY_BUFFER, vbo);
             glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex3D<FXX>) * vertexData.vertexCount, vertexData.vertices, (int)volatility);
-            
-            GLuint ebo;
-            glGenBuffers(1, &ebo);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(FXX) * vertexData.indexCount, vertexData.indices, (int)volatility);
+
+            if (vertexData.indices != nullptr) {
+                GLuint ebo;
+                glGenBuffers(1, &ebo);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(FXX) * vertexData.indexCount, vertexData.indices, (int)volatility);
+            }
 
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex3D<FXX>), 0);
             glEnableVertexAttribArray(0);
@@ -56,7 +58,7 @@ namespace hemlock {
 
             glBindVertexArray(0);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            if (vertexData.indices != nullptr) glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
             return vao;
         }
