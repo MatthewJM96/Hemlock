@@ -8,11 +8,11 @@
 
 namespace hemlock {
     void init() {
-        FreeImage_Initialise();
+        ilInit();
     }
 
     void dispose() {
-        FreeImage_DeInitialise();
+        ilShutDown();
     }
 }
 namespace h = hemlock;
