@@ -4,6 +4,7 @@
 #include <map>
 #include <unordered_map>
 #include <set>
+#include <queue>
 
 #include <string>
 
@@ -17,9 +18,10 @@
 
 #include <glm\glm.hpp>
 
-#include <FreeImage.h>
+#include <IL\il.h>
+#include <IL\ilut.h>
 
 #include "types.h"
 
-#include "io\IOHelpers.hpp"
+#include "io\FileLoader.h"
 #include "Event.hpp"
