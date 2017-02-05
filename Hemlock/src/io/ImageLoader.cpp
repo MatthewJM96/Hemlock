@@ -2,221 +2,256 @@
 
 #include "io\ImageLoader.h"
 
-#include <FreeImage.h>
+void** hio::Image::allocate(std::vector<ui32> widths, std::vector<ui32> heights, std::vector<Format> formats, std::vector<Type> types, std::vector<ui32>& sizes) {
+    if (widths.size() != heights.size() ||
+        widths.size() != formats.size() ||
+        widths.size() != types.size()) return nullptr;
 
-#include "ImageConversion.inl"
+    ui32* tempSizes = nullptr;
+    void** data = allocate(&widths[0], &heights[0], &formats[0], &types[0], tempSizes, widths.size());
+    sizes = std::vector<ui32>(&tempSizes[0], &tempSizes[widths.size() - 1]);
 
-namespace hemlock {
-    namespace io {
-        FIBITMAP* makeRGB(FIBITMAP* bmp) {
-            FIBITMAP* tmp = bmp;
-            bmp = FreeImage_ConvertTo24Bits(bmp);
-            FreeImage_Unload(tmp);
-            return bmp;
+    return data;
+}
+void** hio::Image::allocate(ui32* widths, ui32* heights, Format* formats, Type* types, ui32*& sizes, ui32 count) {
+    if (widths  == nullptr ||
+        heights == nullptr ||
+        formats == nullptr ||
+        types   == nullptr) return nullptr;
+
+    sizes = new ui32[count];
+    void** data = new void*[count];
+    for (ui32 i = 0; i < count; ++i) {
+        data[i] = allocate(widths[i], heights[i], formats[i], types[i], sizes[i]);
+    }
+    return data;
+}
+void* hio::Image::allocate(ui32 width, ui32 height, Format format, Type type, ui32& size) {
+    ui32 channels = 4;
+    if (format == Format::RGB ||
+        format == Format::BGR) channels = 3;
+            
+    switch (type) {
+        case Type::I8:
+        case Type::UI8:
+            return new ui8[width * height * channels];
+        case Type::I16:
+        case Type::UI16:
+            size = sizeof(ui16) * width * height * channels;
+            return new ui16[width * height * channels];
+        case Type::I32:
+        case Type::UI32:
+        case Type::F32:
+            size = sizeof(ui32) * width * height * channels;
+            return new ui32[width * height * channels];
+        case Type::F64:
+            size = sizeof(f64) * width * height * channels;
+            return new f64[width * height * channels];
+        default:
+            return nullptr;
+    }
+}
+
+ui32* hio::Image::load(std::vector<const char*> filepaths, std::vector<FileFormat> types) {
+    if (filepaths.size() != types.size()) return nullptr;
+
+    return load(&filepaths[0], &types[0], filepaths.size());
+}
+ui32* hio::Image::load(const char** filepaths, FileFormat* types, ui32 count) {
+    if (filepaths == nullptr ||
+        types     == nullptr) return nullptr;
+
+    ui32* ids = new ui32[count];
+    for (ui32 i = 0; i < count; ++i) {
+        ids[i] = load(filepaths[i], types[i]);
+    }
+    return ids;
+}
+ui32 hio::Image::load(const char* filepath, FileFormat type /*= FileFormat::UNKNOWN*/) {
+    if (filepath == nullptr) return 0;
+            
+    ILuint imageID;
+    ilGenImages(1, &imageID);
+    ilBindImage(imageID);
+
+    bool res = ilLoad((ILenum)type, filepath);
+
+    ilBindImage(0);
+    if (!res) {
+        ilDeleteImages(1, &imageID);
+        return 0;
+    }
+    return imageID;
+}
+
+ui32* hio::Image::load(std::vector<const void*> data, std::vector<ui32> sizes, std::vector<FileFormat> types) {
+    if (data.size() != sizes.size() ||
+        data.size() != types.size()) return nullptr;
+
+    return load(&data[0], &sizes[0], &types[0], data.size());
+}
+ui32* hio::Image::load(const void** data, ui32* sizes, FileFormat* types, ui32 count) {
+    if (data  == nullptr ||
+        sizes == nullptr ||
+        types == nullptr) return nullptr;
+
+    ui32* ids = new ui32[count];
+    for (ui32 i = 0; i < count; ++i) {
+        ids[i] = load(data[i], sizes[i], types[i]);
+    }
+    return ids;
+}
+ui32 hio::Image::load(const void* data, ui32 size, FileFormat type) {
+    if (data == nullptr) return 0;
+
+    ILuint imageID;
+    ilGenImages(1, &imageID);
+    ilBindImage(imageID);
+
+    // NOTE: Does not support IL_TIF format, but let it be called to generate error.
+    bool res = ilLoadL((ILenum)type, data, size);
+
+    ilBindImage(0);
+    if (!res) {
+        ilDeleteImages(1, &imageID);
+        return 0;
+    }
+    return imageID;
+}
+
+ui8** hio::Image::getData(std::vector<ui32> imageIDs) {
+    return getData(&imageIDs[0], imageIDs.size());
+}
+ui8** hio::Image::getData(ui32* imageIDs, ui32 count) {
+    ui8** data = new ui8*[count];
+    for (ui32 i = 0; i < count; ++i) {
+        data[i] = getData(imageIDs[i]);
+    }
+    return data;
+}
+ui8* hio::Image::getData(ui32 imageID) {
+    if (!ilIsImage(imageID)) return nullptr;
+
+    ilBindImage(imageID);
+    ui8* data = ilGetData();
+
+    ilBindImage(0);
+    return data;
+}
+        
+void hio::Image::unload(std::vector<ui32> imageIDs) {
+    ilDeleteImages(imageIDs.size(), &imageIDs[0]);
+}
+void hio::Image::unload(ui32* imageIDs, ui32 count) {
+    ilDeleteImages(count, imageIDs);
+}
+void hio::Image::unload(ui32 imageID) {
+    ilDeleteImages(1, &imageID);
+}
+
+bool hio::Image::save(std::vector<ui32> imageIDs, std::vector<const char*> filepaths, std::vector<FileFormat> types, bool overwrite /*= true*/) {
+    if (imageIDs.size() != filepaths.size() ||
+        imageIDs.size() != types.size()) return false;
+
+    return save(&imageIDs[0], &filepaths[0], imageIDs.size(), &types[0], overwrite);
+}
+bool hio::Image::save(ui32* imageIDs, const char** filepaths, ui32 count, FileFormat* types /*= nullptr*/, bool overwrite /*= true*/) {
+    if (imageIDs  == nullptr ||
+        filepaths == nullptr) return false;
+
+    bool res = true;
+    for (ui32 i = 0; i < count; ++i) {
+        if (!save(imageIDs[i], filepaths[i], (types == nullptr ? FileFormat::UNKNOWN : types[i]), overwrite)) {
+            res = false;
         }
-        FIBITMAP* makeRGBA(FIBITMAP* bmp) {
-            FIBITMAP* tmp = bmp;
-            bmp = FreeImage_ConvertTo32Bits(bmp);
-            FreeImage_Unload(tmp);
-            return bmp;
-        }
     }
+    return res;
+}
+bool hio::Image::save(ui32 imageID, const char* filepath, FileFormat type /*= FileFormat::UNKNOWN*/, bool overwrite /*= true*/) {
+    if (!ilIsImage(imageID)) return false;
+
+    if (overwrite) ilEnable(IL_FILE_OVERWRITE);
+
+    ilBindImage(imageID);
+    bool res = ilSave((ILenum)type, filepath);
+
+    ilDisable(IL_FILE_OVERWRITE);
+    ilBindImage(0);
+    return res;
 }
 
-void hemlock::io::free(BitmapResource& resource) {
-    delete[] resource.bytesUI8;
-    resource.bytesUI8 = nullptr;
+void** hio::Image::convert(std::vector<ui32> imageIDs, std::vector<Format> formats, std::vector<Type> types, std::vector<ui32>& sizes) {
+    if (imageIDs.size() != formats.size() ||
+        imageIDs.size() != types.size()) return nullptr;
+
+    ui32* tempSizes = nullptr;
+    void** data = convert(&imageIDs[0], &formats[0], &types[0], tempSizes, imageIDs.size());
+    sizes = std::vector<ui32>(&tempSizes[0], &tempSizes[imageIDs.size() - 1]);
+
+    return data;
+}
+void** hio::Image::convert(ui32* imageIDs, Format* formats, Type* types, ui32*& sizes, ui32 count) {
+    if (imageIDs == nullptr ||
+        formats  == nullptr ||
+        types    == nullptr) return nullptr;
+
+    sizes = new ui32[count];
+    void** data = new void*[count];
+    for (ui32 i = 0; i < count; ++i) {
+        data[i] = convert(imageIDs[i], formats[i], types[i], sizes[i]);
+    }
+    return data;
+}
+void* hio::Image::convert(ui32 imageID, Format format, Type type, ui32& size) {
+    if (!ilIsImage(imageID)) return nullptr;
+
+    ilBindImage(imageID);
+            
+    ui32 width  = ilGetInteger(IL_IMAGE_WIDTH);
+    ui32 height = ilGetInteger(IL_IMAGE_HEIGHT);
+
+    void* data = allocate(width, height, format, type, size);
+
+    bool res = ilCopyPixels(0, 0, 0, width, height, 1, (ILenum)format, (ILenum)type, data);
+
+    ilBindImage(0);
+    if (!res) {
+        delete[] data;
+        return nullptr;
+    }
+    return data;
 }
 
-hio::BitmapResource hemlock::io::allocate(ImageIOFormat format, ui32 width, ui32 height) {
-    BitmapResource resource = { width, height, nullptr };
-    ui32 pixelSize;
-    switch (format) {
-        case ImageIOFormat::RGB_UI8:
-            pixelSize = sizeof(ui8) * 3;
-            break;
-        case ImageIOFormat::RGBA_UI8:
-            pixelSize = sizeof(ui8) * 4;
-            break;
-        case ImageIOFormat::RGB_UI16:
-            pixelSize = sizeof(ui16) * 3;
-            break;
-        case ImageIOFormat::RGBA_UI16:
-            pixelSize = sizeof(ui16) * 4;
-            break;
-        case ImageIOFormat::RGB_F32:
-            pixelSize = sizeof(f32) * 3;
-            break;
-        case ImageIOFormat::RGBA_F32:
-            pixelSize = sizeof(f32) * 4;
-            break;
-        case ImageIOFormat::RGB_F64:
-            pixelSize = sizeof(f64) * 3;
-            break;
-        case ImageIOFormat::RGBA_F64:
-            pixelSize = sizeof(f64) * 4;
-            break;
-        default:
-            return resource;
+ui32* hio::Image::convertAndLoad(std::vector<ui32> imageIDs, std::vector<Format> formats, std::vector<Type> types, std::vector<FileFormat> fformats) {
+    if (imageIDs.size() != formats.size() ||
+        imageIDs.size() != types.size()   ||
+        imageIDs.size() != fformats.size()) return nullptr;
+
+    ui32* newIDs = convertAndLoad(&imageIDs[0], &formats[0], &types[0], &fformats[0], imageIDs.size());
+
+    return newIDs;
+}
+ui32* hio::Image::convertAndLoad(ui32* imageIDs, Format* formats, Type* types, FileFormat* fformats, ui32 count) {
+    if (imageIDs == nullptr ||
+        formats  == nullptr ||
+        types    == nullptr ||
+        fformats == nullptr) return nullptr;
+
+    ui32* newIDs = new ui32[count];
+    for (ui32 i = 0; i < count; ++i) {
+        newIDs[i] = convertAndLoad(imageIDs[i], formats[i], types[i], fformats[i]);
     }
-    resource.bytesUI8 = new ui8[pixelSize * width * height];
-    return resource;
+    return newIDs;
+}
+ui32 hio::Image::convertAndLoad(ui32 imageID, Format format, Type type, FileFormat fformat) {
+    if (!ilIsImage(imageID)) return 0;
+
+    ui32 size;
+    void* data = convert(imageID, format, type, size);
+
+    return load(data, size, fformat);
 }
 
-// TODO(Matthew): Better errors (here and basically everywhere).
-hio::BitmapResource hemlock::io::load(const char* filepath, ImageIOFormat format, bool flipV) {
-    BitmapResource resource = { 0, 0, nullptr };
-
-    FREE_IMAGE_FORMAT fif = FreeImage_GetFIFFromFilename(filepath);
-    if (fif == FIF_UNKNOWN) {
-        printf("ERROR: Could not load file: %s!\n", filepath);
-        return resource;
-    }
-
-    FIBITMAP* bmp = FreeImage_Load(fif, filepath);
-    FREE_IMAGE_TYPE bmpType = FreeImage_GetImageType(bmp);
-    if (bmpType == FIT_UNKNOWN) {
-        printf("ERROR: Image from file: %s is of unknown type.\n", filepath);
-        FreeImage_Unload(bmp);
-        return resource;
-    }
-    resource.width = FreeImage_GetWidth(bmp);
-    resource.height = FreeImage_GetHeight(bmp);
-    
-    // Return raw data obtained if no conversion needed.
-    if (format == ImageIOFormat::RAW) {
-        ui32 bytes = resource.height * FreeImage_GetPitch(bmp);
-        resource.data = new ui8[bytes];
-        memcpy(resource.data, FreeImage_GetBits(bmp), bytes);
-        FreeImage_Unload(bmp);
-        return resource;
-    }
-
-    bool error = true;
-    resource = allocate(format, resource.width, resource.height);
-    BMPConvFunc f;
-    switch (bmpType) {
-        case FIT_BITMAP:
-            switch (format) {
-                case ImageIOFormat::RGB_UI8:
-                case ImageIOFormat::RGB_UI16:
-                case ImageIOFormat::RGB_F32:
-                case ImageIOFormat::RGB_F64:
-                    bmp = makeRGB(bmp);
-                    f = flipV ? flip::convRGB8[(size_t)format] : noflip::convRGB8[(size_t)format];
-                    f(bmp, resource);
-                    break;
-                case ImageIOFormat::RGBA_UI8:
-                case ImageIOFormat::RGBA_UI16:
-                case ImageIOFormat::RGBA_F32:
-                case ImageIOFormat::RGBA_F64:
-                    bmp = makeRGBA(bmp);
-                    f = flipV ? flip::convRGBA8[(size_t)format] : noflip::convRGBA8[(size_t)format];
-                    f(bmp, resource);
-                    break;
-                default:
-                    printf("Invalid format requested for file: %s.", filepath);
-                    error = true;
-                    break;
-            }
-            break;
-        case FIT_UINT16:
-            f = flipV ? flip::convUI16[(size_t)format] : noflip::convUI16[(size_t)format];
-            f(bmp, resource);
-            break;
-        case FIT_INT16:
-            f = flipV ? flip::convI16[(size_t)format] : noflip::convI16[(size_t)format];
-            f(bmp, resource);
-            break;
-        case FIT_UINT32:
-            f = flipV ? flip::convUI32[(size_t)format] : noflip::convUI32[(size_t)format];
-            f(bmp, resource);
-            break;
-        case FIT_INT32:
-            f = flipV ? flip::convI32[(size_t)format] : noflip::convI32[(size_t)format];
-            f(bmp, resource);
-            break;
-        case FIT_FLOAT:
-            f = flipV ? flip::convF32[(size_t)format] : noflip::convF32[(size_t)format];
-            f(bmp, resource);
-            break;
-        case FIT_DOUBLE:
-            f = flipV ? flip::convF64[(size_t)format] : noflip::convF64[(size_t)format];
-            f(bmp, resource);
-            break;
-        case FIT_RGB16:
-            f = flipV ? flip::convRGB16[(size_t)format] : noflip::convRGB16[(size_t)format];
-            f(bmp, resource);
-            break;
-        case FIT_RGBA16:
-            f = flipV ? flip::convRGBA16[(size_t)format] : noflip::convRGBA16[(size_t)format];
-            f(bmp, resource);
-            break;
-        case FIT_RGBF:
-            f = flipV ? flip::convRGBF[(size_t)format] : noflip::convRGBF[(size_t)format];
-            f(bmp, resource);
-            break;
-        case FIT_RGBAF:
-            f = flipV ? flip::convRGBAF[(size_t)format] : noflip::convRGBAF[(size_t)format];
-            f(bmp, resource);
-            break;
-        case FIT_COMPLEX:
-            puts("Cannae do complex images.");
-            error = true;
-            break;
-        default:
-            puts("Cannae do complex images.");
-            error = true;
-            break;
-    }
-    FreeImage_Unload(bmp);
-    if (error) {
-        free(resource);
-        resource.data = nullptr;
-    }
-    return resource;
-}
-
-bool hemlock::io::save(const char* filepath, ImageIOFormat format, const void* data, ui32 width, ui32 height) {
-    FREE_IMAGE_FORMAT fif = FreeImage_GetFIFFromFilename(filepath);
-    if (fif == FIF_UNKNOWN) {
-        printf("Unable to save to file of unknown type: %s!\n", filepath);
-        return false;
-    }
-
-    ui32 bytes;
-    switch (format) {
-        case ImageIOFormat::RGB_UI8:   bytes = 3 * sizeof(ui8);  break;
-        case ImageIOFormat::RGBA_UI8:  bytes = 4 * sizeof(ui8);  break;
-        case ImageIOFormat::RGB_UI16:  bytes = 3 * sizeof(ui16); break;
-        case ImageIOFormat::RGBA_UI16: bytes = 4 * sizeof(ui16); break;
-        case ImageIOFormat::RGB_F32:   bytes = 3 * sizeof(f32);  break;
-        case ImageIOFormat::RGBA_F32:  bytes = 4 * sizeof(f32);  break;
-        case ImageIOFormat::RGB_F64:   bytes = 3 * sizeof(f64);  break;
-        case ImageIOFormat::RGBA_F64:  bytes = 4 * sizeof(f64);  break;
-        default:
-            printf("Cannot save image without a format being specified!\n");
-            return false;
-    }
-
-    FIBITMAP* bmp = FreeImage_Allocate(width, height, bytes << 3);
-    
-    switch (format) {
-        case ImageIOFormat::RGB_UI8:   moveRGB<ui8>  ((ui8*) FreeImage_GetBits(bmp), (ui8*) data, width, height); break;
-        case ImageIOFormat::RGBA_UI8:  moveRGBA<ui8> ((ui8*) FreeImage_GetBits(bmp), (ui8*) data, width, height); break;
-        case ImageIOFormat::RGB_UI16:  moveRGB<ui16> ((ui16*)FreeImage_GetBits(bmp), (ui16*)data, width, height); break;
-        case ImageIOFormat::RGBA_UI16: moveRGBA<ui16>((ui16*)FreeImage_GetBits(bmp), (ui16*)data, width, height); break;
-        case ImageIOFormat::RGB_F32:   moveRGB<f32>  ((f32*) FreeImage_GetBits(bmp), (f32*) data, width, height); break;
-        case ImageIOFormat::RGBA_F32:  moveRGBA<f32> ((f32*) FreeImage_GetBits(bmp), (f32*) data, width, height); break;
-        case ImageIOFormat::RGB_F64:   moveRGB<f64>  ((f64*) FreeImage_GetBits(bmp), (f64*) data, width, height); break;
-        case ImageIOFormat::RGBA_F64:  moveRGBA<f64> ((f64*) FreeImage_GetBits(bmp), (f64*) data, width, height); break;
-        default:
-            printf("Cannot save image without a format being specified!\n");
-            return false;
-    }
-
-    FreeImage_Save(fif, bmp, filepath);
-    FreeImage_Unload(bmp);
-
-    return true;
+hio::Image::Error hio::Image::getError() {
+    return (Error)ilGetError();
 }
