@@ -29,6 +29,8 @@ h::Event<hui::MouseWheelScrollEvent> hui::InputDispatcher::onMouseWheelScroll(nu
 
 h::Event<>                           hui::InputDispatcher::onKeyboardFocusLost(nullptr);
 h::Event<>                           hui::InputDispatcher::onKeyboardFocusGained(nullptr);
+h::Event<hui::KeyboardButtonEvent>   hui::InputDispatcher::onKeyboardButtonDown(nullptr);
+h::Event<hui::KeyboardButtonEvent>   hui::InputDispatcher::onKeyboardButtonUp(nullptr);
 
 h::Event<>                           hui::InputDispatcher::onQuit(nullptr);
 
@@ -89,6 +91,17 @@ i32 hui::InputDispatcher::handleInputEvent(void* data, SDL_Event* event) {
                 mwse.dy *= -1;
             }
             onMouseWheelScroll(mwse);
+            break;
+        case SDL_KEYDOWN:
+        case SDL_KEYUP:
+            KeyboardButtonEvent kbe;
+            kbe.physicalKey = event->key.keysym.scancode;
+            kbe.virtualKey  = event->key.keysym.sym;
+            if (event->key.type == SDL_KEYDOWN) {
+                onKeyboardButtonDown(kbe);
+            } else {
+                onKeyboardButtonUp(kbe);
+            }
             break;
         case SDL_QUIT:
             SDL_Quit();

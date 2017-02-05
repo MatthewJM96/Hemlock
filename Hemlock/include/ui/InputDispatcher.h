@@ -17,6 +17,7 @@ namespace hemlock {
         //   TextInput
         //   TextEdit
 
+        // TODO(Matthew): Replace mouse and keyboard state objects with pointer to InputManager.
         struct MouseState {
             bool left : 1;
             bool right : 1;
@@ -35,7 +36,22 @@ namespace hemlock {
         struct MouseMoveEvent : MouseEvent {
             i32 dx, dy;
         };
-        
+
+        struct KeyboardState { // Encodes common key modifier states.
+            bool lctrl   : 1;
+            bool lalt    : 1;
+            bool lshft   : 1;
+            bool rctrl   : 1;
+            bool ralt    : 1;
+            bool rshft   : 1;
+        };
+        struct KeyboardEvent {
+            KeyboardState state;
+        };
+        struct KeyboardButtonEvent : KeyboardEvent {
+            ui32 physicalKey, virtualKey;
+        };
+
         class InputDispatcher {
         public:
             static InputDispatcher* getInstance() {
@@ -63,6 +79,8 @@ namespace hemlock {
 
             static Event<>                      onKeyboardFocusLost;
             static Event<>                      onKeyboardFocusGained;
+            static Event<KeyboardButtonEvent>   onKeyboardButtonDown;
+            static Event<KeyboardButtonEvent>   onKeyboardButtonUp;
 
             static Event<>                      onQuit;
         private:
