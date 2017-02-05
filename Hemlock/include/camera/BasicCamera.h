@@ -25,9 +25,11 @@ namespace hemlock {
             void setFarClipping(f32 farClipping);
             void setClipping(f32 nearClipping, f32 farClipping);
             void setPosition(glm::f32vec3 position);
-            void setDirection(glm::f32vec3 direction);
-            void setRight(glm::f32vec3 right);
-            void setUp(glm::f32vec3 up);
+            // TODO(Matthew): For these we must make sure that the other three vectors are updated accordingly.
+            // TODO(Matthew): Better to make these an optional part of initialisation only?
+            //void setDirection(glm::f32vec3 direction);
+            //void setRight(glm::f32vec3 right);
+            //void setUp(glm::f32vec3 up);
 
             void offsetPosition(glm::f32vec3 offsets);
             void offsetPosition(f32 xOff, f32 yOff, f32 zOff);
