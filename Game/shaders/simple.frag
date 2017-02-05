@@ -12,6 +12,6 @@ uniform sampler2D tex2;
 void main()
 {
 
-	color = mix(texture(tex1, textureCoord), texture(tex2, textureCoord), 0.2);// * vertexColour;
+	color = mix(texture(tex1, textureCoord), texture(tex2, textureCoord), 0.3);// * vertexColour;
 	//color = texture(tex1, textureCoord);
 }
