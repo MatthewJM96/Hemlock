@@ -20,6 +20,9 @@ void happ::IApp::init() {
     m_inputManager = new hui::InputManager();
     hui::InputDispatcher::getInstance()->init(m_window, m_inputManager);
 
+    ilutRenderer(ILUT_OPENGL);
+    ilutEnable(ILUT_OPENGL_CONV); // TODO(Matthew): Make this optional, some projects may consider on-board texture conversions fine.
+    
     m_currentTimes = {};
     m_previousTimes = {};
 
