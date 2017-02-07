@@ -12,9 +12,9 @@ namespace hemlock {
             ui32  load(ui32 imageID, bool mipmap = false);
 
             // TODO(Matthew): Actually implement these.
-            ui32* load(std::vector<const void*> data, std::vector<hio::Image::Format> formats, std::vector<hio::Image::Type> types, bool mipmap = false);
-            ui32* load(const void** data, hio::Image::Format* formats, hio::Image::Type* types, ui32 count, bool mipmap = false);
-            ui32  load(const void* data, hio::Image::Format format, hio::Image::Type type, bool mipmap = false);
+            //ui32* load(std::vector<const void*> data, std::vector<hio::Image::Format> formats, std::vector<hio::Image::Type> types, bool mipmap = false);
+            //ui32* load(const void** data, hio::Image::Format* formats, hio::Image::Type* types, ui32 count, bool mipmap = false);
+            //ui32  load(const void* data, hio::Image::Format format, hio::Image::Type type, bool mipmap = false);
         }
     }
 }
