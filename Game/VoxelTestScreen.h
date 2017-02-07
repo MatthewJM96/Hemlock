@@ -3,9 +3,9 @@
 #include <app\IScreen.h>
 #include <camera\BasicCamera.h>
 #include <graphics\GLSLProgram.h>
-#include <procedural\Noise.h>
 #include <ui\InputDispatcher.h>
 #include <ui\InputManager.h>
+#include <procedural\Noise.hpp>
 
 class VoxelTestScreen : public happ::IScreen {
 public:

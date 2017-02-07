@@ -5,7 +5,6 @@
 #include <Event.hpp>
 #include <graphics\Mesh.hpp>
 #include <graphics\Texture.h>
-#include <maths\Fractal.h>
 
 #include <glm\gtc\matrix_transform.hpp>
 
@@ -85,7 +84,7 @@ void VoxelTestScreen::init(char* name) {
     m_mapDesc.modifier = 1.0;
     m_mapDesc.op = hproc::Noise::Operation::ADD;
     m_mapDesc.multiplier = hproc::Noise::Multiplier::NONE;
-    m_mapDesc.bound = { -25.0, 25.0 };
+    m_mapDesc.bound = { -2.0, 6.0 };
     m_mapDesc.clamp = { 0.0,  0.0 };
 
     m_heightmap = new f32[101 * 101];
@@ -110,28 +109,36 @@ void VoxelTestScreen::dispose() {
 }
 
 void VoxelTestScreen::update(TimeData time) {
-    if (m_inputManager->isPressed(hui::PhysicalKey::H_W)) {
-        m_camera.offsetPosition(0.05f * m_camera.getDirection());
+    f32 speed = 0.1f;
+    auto& modifiers = m_inputManager->getCurrentKeyModifierState();
+    if (modifiers.lctrl) {
+        speed *= 5;
+    }
+    if (modifiers.lalt) {
+        speed *= 10;
+    }
+    if (m_inputManager->isPressed(hui::PhysicalKey::H_W)) {        
+        m_camera.offsetPosition(speed * m_camera.getDirection());
     }
     if (m_inputManager->isPressed(hui::PhysicalKey::H_A)) {
-        m_camera.offsetPosition(-0.05f * m_camera.getRight());
+        m_camera.offsetPosition(-speed * m_camera.getRight());
     }
     if (m_inputManager->isPressed(hui::PhysicalKey::H_S)) {
-        m_camera.offsetPosition(-0.05f * m_camera.getDirection());
+        m_camera.offsetPosition(-speed * m_camera.getDirection());
     }
     if (m_inputManager->isPressed(hui::PhysicalKey::H_D)) {
-        m_camera.offsetPosition(0.05f * m_camera.getRight());
+        m_camera.offsetPosition(speed * m_camera.getRight());
     }
 
     // Update heightmap to be of new location if we move out of range of current loc.
     glm::f64vec3 pos = glm::f64vec3(m_camera.getPosition());
     pos += glm::f64vec3(50.0, 50.0, 0.0);
     pos /= 100.0;
-    glm::floor(pos);
+    pos = glm::floor(pos);
     if (m_chunkLoc.x != pos.x || m_chunkLoc.y != pos.y) {
         for (i32 x = -50; x <= 50; ++x) {
             for (i32 y = -50; y <= 50; ++y) {
-                m_heightmap[(x + 50) + 101 * (y + 50)] = hproc::Noise::getNoiseValue(glm::f64vec2(x, y), m_mapDesc);
+                m_heightmap[(x + 50) + 101 * (y + 50)] = hproc::Noise::getNoiseValue(glm::f64vec2(x + (101 * pos.x), y + (101 * pos.y)), m_mapDesc);
                 //m_heightmap[(x + 50) + 101 * (y + 50)] = hm::Fractal::genSimplexWithOctavesScaled(m_mapDesc.octaves, m_mapDesc.persistence, m_mapDesc.frequency, m_mapDesc.bound.lo, m_mapDesc.bound.hi, glm::f64vec2(x, y));
             }
         }
@@ -166,7 +173,7 @@ void VoxelTestScreen::draw(TimeData time) {
     glBindVertexArray(m_voxVAO);
     for (f32 x = -50.0f; x <= 50.0f; ++x) {
         for (f32 y = -50.0f; y <= 50.0f; ++y) {
-            for (f32 z = 0.0f; z <= m_heightmap[((ui32)x + 50) + 101 * ((ui32)y + 50)]; ++z) {
+            for (f32 z = -2.0f; z <= m_heightmap[((ui32)x + 50) + 101 * ((ui32)y + 50)]; ++z) {
                 glm::f32mat4 model = glm::translate(glm::f32mat4(), glm::f32vec3(x + (101 * m_chunkLoc.x), y + (101 * m_chunkLoc.y), z));
                 glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &model[0][0]);
 
