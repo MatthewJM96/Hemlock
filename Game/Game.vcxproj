@@ -149,11 +149,13 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="MainMenuScreen.cpp" />
+    <ClCompile Include="VoxelTestScreen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="MainMenuScreen.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="VoxelTestScreen.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
