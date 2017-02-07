@@ -162,12 +162,15 @@
   <ItemGroup>
     <ClCompile Include="src\app\IApp.cpp" />
     <ClCompile Include="src\camera\BasicCamera.cpp" />
+    <ClCompile Include="src\camera\BasicFPSCamera.cpp" />
     <ClCompile Include="src\graphics\GLSLProgram.cpp" />
     <ClCompile Include="src\app\IScreen.cpp" />
     <ClCompile Include="src\graphics\Texture.cpp" />
     <ClCompile Include="src\graphics\Window.cpp" />
     <ClCompile Include="src\io\FileLoader.cpp" />
     <ClCompile Include="src\io\ImageLoader.cpp" />
+    <ClCompile Include="src\maths\Fractal.cpp" />
+    <ClCompile Include="src\procedural\Noise.cpp" />
     <ClCompile Include="src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
@@ -178,6 +181,7 @@
   <ItemGroup>
     <ClInclude Include="include\app\IApp.h" />
     <ClInclude Include="include\camera\BasicCamera.h" />
+    <ClInclude Include="include\camera\BasicFPSCamera.h" />
     <ClInclude Include="include\Event.hpp" />
     <ClInclude Include="include\graphics\GLSLProgram.h" />
     <ClInclude Include="include\app\IScreen.h" />
@@ -188,12 +192,15 @@
     <ClInclude Include="include\Hemlock.hpp" />
     <ClInclude Include="include\io\ImageLoader.h" />
     <ClInclude Include="include\io\FileLoader.h" />
+    <ClInclude Include="include\maths\Fractal.h" />
     <ClInclude Include="include\maths\TweeningMaths.hpp" />
+    <ClInclude Include="include\procedural\Noise.h" />
     <ClInclude Include="include\stdafx.h" />
     <ClInclude Include="include\Timing.h" />
     <ClInclude Include="include\types.h" />
     <ClInclude Include="include\ui\InputDispatcher.h" />
     <ClInclude Include="include\ui\InputManager.h" />
+    <ClInclude Include="include\ui\Keys.hpp" />
     <ClInclude Include="include\voxel\VoxelMesh.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
