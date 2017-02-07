@@ -54,12 +54,6 @@
     <ClCompile Include="src\camera\BasicFPSCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\maths\Fractal.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\procedural\Noise.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\stdafx.h">
@@ -125,10 +119,10 @@
     <ClInclude Include="include\ui\Keys.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\maths\Fractal.h">
+    <ClInclude Include="include\maths\Fractal.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\procedural\Noise.h">
+    <ClInclude Include="include\procedural\Noise.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
