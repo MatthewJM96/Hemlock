@@ -36,6 +36,10 @@ hg::WindowError hg::Window::init() {
 
     printf("*** OpenGL Version: %s ***\n", glGetString(GL_VERSION));
 
+    GLint nrAttributes;
+    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
+    printf("Maximum # of vertex attributes supported: %d.\n", nrAttributes);
+
     glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
 
     if (m_settings.swapInterval == SwapInterval::V_SYNC) {
