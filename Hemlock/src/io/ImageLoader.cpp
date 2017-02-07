@@ -8,7 +8,7 @@ void** hio::Image::allocate(std::vector<ui32> widths, std::vector<ui32> heights,
         widths.size() != types.size()) return nullptr;
 
     ui32* tempSizes = nullptr;
-    void** data = allocate(&widths[0], &heights[0], &formats[0], &types[0], tempSizes, widths.size());
+    void** data = allocate(&widths[0], &heights[0], &formats[0], &types[0], tempSizes, (ui32)widths.size());
     sizes = std::vector<ui32>(&tempSizes[0], &tempSizes[widths.size() - 1]);
 
     return data;
@@ -55,7 +55,7 @@ void* hio::Image::allocate(ui32 width, ui32 height, Format format, Type type, ui
 ui32* hio::Image::load(std::vector<const char*> filepaths, std::vector<FileFormat> types) {
     if (filepaths.size() != types.size()) return nullptr;
 
-    return load(&filepaths[0], &types[0], filepaths.size());
+    return load(&filepaths[0], &types[0], (ui32)filepaths.size());
 }
 ui32* hio::Image::load(const char** filepaths, FileFormat* types, ui32 count) {
     if (filepaths == nullptr ||
@@ -88,7 +88,7 @@ ui32* hio::Image::load(std::vector<const void*> data, std::vector<ui32> sizes, s
     if (data.size() != sizes.size() ||
         data.size() != types.size()) return nullptr;
 
-    return load(&data[0], &sizes[0], &types[0], data.size());
+    return load(&data[0], &sizes[0], &types[0], (ui32)data.size());
 }
 ui32* hio::Image::load(const void** data, ui32* sizes, FileFormat* types, ui32 count) {
     if (data  == nullptr ||
@@ -120,7 +120,7 @@ ui32 hio::Image::load(const void* data, ui32 size, FileFormat type) {
 }
 
 ui8** hio::Image::getData(std::vector<ui32> imageIDs) {
-    return getData(&imageIDs[0], imageIDs.size());
+    return getData(&imageIDs[0], (ui32)imageIDs.size());
 }
 ui8** hio::Image::getData(ui32* imageIDs, ui32 count) {
     ui8** data = new ui8*[count];
@@ -153,7 +153,7 @@ bool hio::Image::save(std::vector<ui32> imageIDs, std::vector<const char*> filep
     if (imageIDs.size() != filepaths.size() ||
         imageIDs.size() != types.size()) return false;
 
-    return save(&imageIDs[0], &filepaths[0], imageIDs.size(), &types[0], overwrite);
+    return save(&imageIDs[0], &filepaths[0], (ui32)imageIDs.size(), &types[0], overwrite);
 }
 bool hio::Image::save(ui32* imageIDs, const char** filepaths, ui32 count, FileFormat* types /*= nullptr*/, bool overwrite /*= true*/) {
     if (imageIDs  == nullptr ||
@@ -185,7 +185,7 @@ void** hio::Image::convert(std::vector<ui32> imageIDs, std::vector<Format> forma
         imageIDs.size() != types.size()) return nullptr;
 
     ui32* tempSizes = nullptr;
-    void** data = convert(&imageIDs[0], &formats[0], &types[0], tempSizes, imageIDs.size());
+    void** data = convert(&imageIDs[0], &formats[0], &types[0], tempSizes, (ui32)imageIDs.size());
     sizes = std::vector<ui32>(&tempSizes[0], &tempSizes[imageIDs.size() - 1]);
 
     return data;
@@ -227,7 +227,7 @@ ui32* hio::Image::convertAndLoad(std::vector<ui32> imageIDs, std::vector<Format>
         imageIDs.size() != types.size()   ||
         imageIDs.size() != fformats.size()) return nullptr;
 
-    ui32* newIDs = convertAndLoad(&imageIDs[0], &formats[0], &types[0], &fformats[0], imageIDs.size());
+    ui32* newIDs = convertAndLoad(&imageIDs[0], &formats[0], &types[0], &fformats[0], (ui32)imageIDs.size());
 
     return newIDs;
 }
