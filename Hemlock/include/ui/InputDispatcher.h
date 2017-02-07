@@ -5,30 +5,18 @@
 
 namespace hemlock {
     namespace ui {
-        // Input Events:
-        //   MouseButtonDown
-        //   MouseButtonUp
-        //   MouseWheelScroll
-        //   MouseMove
-        //   MouseFocusGained
-        //   MouseFocusLost
-        //   KeyboardButtonDown
-        //   KeyboardButtonUp
-        //   TextInput
-        //   TextEdit
-
-        // TODO(Matthew): Replace mouse and keyboard state objects with pointer to InputManager.
-        struct MouseState {
-            bool left : 1;
-            bool right : 1;
-            bool middle : 1;
+        struct InputEvent {
+            CommonMouseState mouse;
+            KeyModifiers     modifiers;
         };
-        struct MouseEvent {
-            ui32 x, y;
-            MouseState state; // Bit field of whether left, right or middle mouse buttons are pressed.
+
+        struct MouseEvent : InputEvent {
+            MouseCoords coords;
         };
         struct MouseButtonEvent : MouseEvent {
-            hui::MouseButton button;
+            hui::MouseButton name;
+            ui8              buttonID;
+            ui8              presses;
         };
         struct MouseWheelScrollEvent : MouseEvent {
             i32 dx, dy;
@@ -37,19 +25,26 @@ namespace hemlock {
             i32 dx, dy;
         };
 
-        struct KeyboardState { // Encodes common key modifier states.
-            bool lctrl   : 1;
-            bool lalt    : 1;
-            bool lshft   : 1;
-            bool rctrl   : 1;
-            bool ralt    : 1;
-            bool rshft   : 1;
+        struct KeyboardButtonEvent : InputEvent {
+            PhysicalKey physicalKey;
+            VirtualKey  virtualKey;
+            ButtonState state;
+            ui8         presses;
         };
-        struct KeyboardEvent {
-            KeyboardState state;
+
+        struct TextInputEvent : InputEvent {
+            ui8 text[32];
         };
-        struct KeyboardButtonEvent : KeyboardEvent {
-            ui32 physicalKey, virtualKey;
+        struct TextEditingEvent : TextInputEvent {
+            ui32 start;
+            ui32 length;
+        };
+                
+        struct TextDropEvent {
+            const char* text;
+        };
+        struct FileDropEvent {
+            const char* filename;
         };
 
         class InputDispatcher {
@@ -62,27 +57,38 @@ namespace hemlock {
             }
             InputDispatcher(InputDispatcher const&) = delete;
             void operator=(InputDispatcher const&)  = delete;
-            ~InputDispatcher() {};
+            ~InputDispatcher() {
+                dispose();
+            };
 
             void init(hg::Window* window, hui::InputManager* manager);
             void dispose();
 
+            void setTextMode(bool on);
+
             static i32 handleInputEvent(void* data, SDL_Event* event);
 
-            // TODO(Matthew): Better place for these?
-            static Event<>                      onMouseFocusLost;
-            static Event<>                      onMouseFocusGained;
-            static Event<MouseMoveEvent>        onMouseMove;
-            static Event<MouseButtonEvent>      onMouseButtonDown;
-            static Event<MouseButtonEvent>      onMouseButtonUp;
-            static Event<MouseWheelScrollEvent> onMouseWheelScroll;
+            PriorityEvent<>                      onMouseFocusLost;
+            PriorityEvent<>                      onMouseFocusGained;
+            PriorityEvent<MouseMoveEvent>        onMouseMove;
+            PriorityEvent<MouseButtonEvent>      onMouseButtonDown;
+            PriorityEvent<MouseButtonEvent>      onMouseButtonUp;
+            PriorityEvent<MouseWheelScrollEvent> onMouseWheelScroll;
 
-            static Event<>                      onKeyboardFocusLost;
-            static Event<>                      onKeyboardFocusGained;
-            static Event<KeyboardButtonEvent>   onKeyboardButtonDown;
-            static Event<KeyboardButtonEvent>   onKeyboardButtonUp;
+            PriorityEvent<>                      onKeyboardFocusLost;
+            PriorityEvent<>                      onKeyboardFocusGained;
+            PriorityEvent<KeyboardButtonEvent>   onKeyboardButtonDown;
+            PriorityEvent<KeyboardButtonEvent>   onKeyboardButtonUp;
 
-            static Event<>                      onQuit;
+            PriorityEvent<TextInputEvent>        onTextInput;
+            PriorityEvent<TextEditingEvent>      onTextEditing;
+
+            PriorityEvent<>                      onDropBegin;
+            PriorityEvent<>                      onDropComplete;
+            PriorityEvent<TextDropEvent>         onTextDrop;
+            PriorityEvent<FileDropEvent>         onFileDrop;
+
+            RPriorityEvent<bool>                 onQuit;
         private:
             InputDispatcher() :
                 m_window(nullptr) {};
