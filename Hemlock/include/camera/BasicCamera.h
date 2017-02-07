@@ -15,42 +15,37 @@ namespace hemlock {
             BasicCamera() {};
             ~BasicCamera() {};
             
-            void attachToWindow(hg::Window* window);
+            virtual void attachToWindow(hg::Window* window);
 
-            void update();
+            virtual void update();
 
-            void setAspectRatio(f32 aspectRatio);
-            void setFov(f32 fov);
-            void setNearClipping(f32 nearClipping);
-            void setFarClipping(f32 farClipping);
-            void setClipping(f32 nearClipping, f32 farClipping);
-            void setPosition(glm::f32vec3 position);
-            // TODO(Matthew): For these we must make sure that the other three vectors are updated accordingly.
-            // TODO(Matthew): Better to make these an optional part of initialisation only?
-            //void setDirection(glm::f32vec3 direction);
-            //void setRight(glm::f32vec3 right);
-            //void setUp(glm::f32vec3 up);
+            virtual void setAspectRatio(f32 aspectRatio);
+            virtual void setFov(f32 fov);
+            virtual void setNearClipping(f32 nearClipping);
+            virtual void setFarClipping(f32 farClipping);
+            virtual void setClipping(f32 nearClipping, f32 farClipping);
+            virtual void setPosition(glm::f32vec3 position);
 
-            void offsetPosition(glm::f32vec3 offsets);
-            void offsetPosition(f32 xOff, f32 yOff, f32 zOff);
+            virtual void offsetPosition(glm::f32vec3 offsets);
+            virtual void offsetPosition(f32 xOff, f32 yOff, f32 zOff);
 
-            void applyRotation(glm::f32quat quaternion);
-            void rotateFromMouse(f32 dx, f32 dy, f32 speed);
-            void rollFromMouse(f32 dx, f32 speed);
+            virtual void applyRotation(glm::f32quat quaternion);
+            virtual void rotateFromMouse(f32 dx, f32 dy, f32 speed);
+            virtual void rollFromMouse(f32 dx, f32 speed);
 
-            f32          getAspectRatio()          const { return m_aspectRatio; };
-            f32          getFov()                  const { return m_fov; };
-            f32          getNearClipping()         const { return m_nearClipping; };
-            f32          getFarClipping()          const { return m_farClipping; };
-            glm::f32vec3 getPosition()             const { return m_position; };
-            glm::f32vec3 getDirection()            const { return m_direction; };
-            glm::f32vec3 getRight()                const { return m_right; };
-            glm::f32vec3 getUp()                   const { return m_up; };
-            glm::f32mat4 getProjectionMatrix()     const { return m_projectionMatrix; };
-            glm::f32mat4 getViewMatrix()           const { return m_viewMatrix; };
-            glm::f32mat4 getViewProjectionMatrix() const { return m_viewProjectionMatrix; };
-        private:
-            void handleWindowResize(h::Sender window, hg::ResizeEvent event);
+            virtual f32          getAspectRatio()          const { return m_aspectRatio; };
+            virtual f32          getFov()                  const { return m_fov; };
+            virtual f32          getNearClipping()         const { return m_nearClipping; };
+            virtual f32          getFarClipping()          const { return m_farClipping; };
+            virtual glm::f32vec3 getPosition()             const { return m_position; };
+            virtual glm::f32vec3 getDirection()            const { return m_direction; };
+            virtual glm::f32vec3 getRight()                const { return m_right; };
+            virtual glm::f32vec3 getUp()                   const { return m_up; };
+            virtual glm::f32mat4 getProjectionMatrix()     const { return m_projectionMatrix; };
+            virtual glm::f32mat4 getViewMatrix()           const { return m_viewMatrix; };
+            virtual glm::f32mat4 getViewProjectionMatrix() const { return m_viewProjectionMatrix; };
+        protected:
+            virtual void handleWindowResize(h::Sender window, hg::ResizeEvent event);
 
             f32 m_aspectRatio        = 4.0f/3.0f;
             f32 m_fov                = 90.0f;

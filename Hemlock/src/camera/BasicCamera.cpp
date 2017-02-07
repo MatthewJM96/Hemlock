@@ -11,8 +11,6 @@ void hcam::BasicCamera::attachToWindow(hg::Window* window) {
 
 void hcam::BasicCamera::update() {
     if (m_viewChanged) {
-        m_right = glm::normalize(glm::cross(m_direction, glm::vec3(0.0f, 1.0f, 0.0f)));
-        m_up = glm::normalize(glm::cross(m_right, m_direction));
         m_viewMatrix = glm::lookAt(m_position, m_position + m_direction, m_up);
     }
     if (m_projectionChanged) {
@@ -58,21 +56,6 @@ void hcam::BasicCamera::setPosition(glm::f32vec3 position) {
     m_viewChanged = true;
 }
 
-//void hcam::BasicCamera::setDirection(glm::f32vec3 direction) {
-//    m_direction = direction;
-//    m_viewChanged = true;
-//}
-//
-//void hcam::BasicCamera::setRight(glm::f32vec3 right) {
-//    m_right = right;
-//    m_viewChanged = true;
-//}
-//
-//void hcam::BasicCamera::setUp(glm::f32vec3 up) {
-//    m_up = up;
-//    m_viewChanged = true;
-//}
-
 void hcam::BasicCamera::offsetPosition(glm::f32vec3 offsets) {
     m_position += offsets;
     m_viewChanged = true;
@@ -84,6 +67,9 @@ void hcam::BasicCamera::offsetPosition(f32 xOff, f32 yOff, f32 zOff) {
 
 void hcam::BasicCamera::applyRotation(glm::f32quat quaternion) {
     m_direction = glm::normalize(quaternion * m_direction);
+    m_right     = glm::normalize(quaternion * m_right);
+    m_up        = glm::normalize(glm::cross(m_right, m_direction));
+    //m_right = glm::normalize(glm::cross(m_direction, glm::vec3(0.0f, 1.0f, 0.0f)));
 
     m_viewChanged = true;
 }
