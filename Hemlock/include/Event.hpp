@@ -151,15 +151,15 @@ namespace hemlock {
             m_sender = s;
         }
 
-        Return trigger(Args... a) {
-            Return ret;
+        DataRet trigger(Args... a) {
+            Return ret = {};
             for (auto& callback : m_callbacks) {
                 ret = callback.second(m_sender, a...);
                 if (!ret.shouldContinue) break;
             }
-            return ret;
+            return ret.data;
         }
-        Return operator()(Args... a) {
+        DataRet operator()(Args... a) {
             return trigger(a...);
         }
 
