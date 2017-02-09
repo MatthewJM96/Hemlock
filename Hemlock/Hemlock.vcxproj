@@ -131,6 +131,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;HEMLOCK_USING_PCH;OS_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -148,6 +149,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;HEMLOCK_USING_PCH;OS_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -199,6 +201,10 @@
     <ClInclude Include="include\ui\InputDispatcher.h" />
     <ClInclude Include="include\ui\InputManager.h" />
     <ClInclude Include="include\ui\Keys.hpp" />
+    <ClInclude Include="include\voxel\Chunk.h" />
+    <ClInclude Include="include\voxel\ChunkCoordSystems.hpp" />
+    <ClInclude Include="include\voxel\IChunkGenerator.h" />
+    <ClInclude Include="include\voxel\ChunkGrid.h" />
     <ClInclude Include="include\voxel\VoxelMesh.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

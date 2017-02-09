@@ -125,5 +125,17 @@
     <ClInclude Include="include\procedural\Noise.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\voxel\Chunk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\voxel\ChunkGrid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\voxel\ChunkCoordSystems.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\voxel\IChunkGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
