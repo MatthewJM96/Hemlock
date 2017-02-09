@@ -1,11 +1,15 @@
 #pragma once
 
 #include <app\IScreen.h>
-#include <camera\BasicCamera.h>
+#include <camera\BasicFPSCamera.h>
 #include <graphics\GLSLProgram.h>
 #include <ui\InputDispatcher.h>
 #include <ui\InputManager.h>
 #include <procedural\Noise.hpp>
+#include <voxel\ChunkGrid.h>
+#include <voxel\Chunk.h>
+
+#include "Constants.hpp"
 
 class VoxelTestScreen : public happ::IScreen {
 public:
@@ -18,8 +22,9 @@ public:
     void draw(TimeData time);
 
     bool handleMouseMovement(h::Sender sender, hui::MouseMoveEvent event);
+    bool handleMouseCapture(h::Sender sender, hui::KeyboardButtonEvent event);
 private:
-    hcam::BasicCamera  m_camera;
+    hcam::BasicFPSCamera  m_camera;
     hg::GLSLProgram    m_shader;
     hui::InputManager* m_inputManager;
     
@@ -27,8 +32,10 @@ private:
     GLuint m_texture2;
     GLuint m_voxVAO;
 
-    f32* m_heightmap;
-    hproc::Noise::NoiseData<f64> m_mapDesc;
+    hvox::ChunkGrid<CHUNK_SIZE> m_chunkGrid;
 
-    glm::f64vec2 m_chunkLoc;
+    /*f32* m_heightmap;
+    hproc::Noise::NoiseData<f64> m_mapDesc;*/
+
+    glm::f64vec3 m_chunkLoc = glm::f64vec3(0, 0, 0);
 };
