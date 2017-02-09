@@ -15,7 +15,7 @@ namespace hemlock {
             virtual void rotateFromMouse(f32 dx, f32 dy, f32 speed);
             virtual void rollFromMouse(f32 dx, f32 speed);
         protected:
-            const glm::f32vec3 WORLD_UP = glm::f32vec3(0.0f, 1.0f, 0.0f);
+            const glm::f32vec3 WORLD_UP = glm::f32vec3(0.0f, 0.0f, 1.0f);
 
             f32 m_pitch;
             f32 m_yaw;
