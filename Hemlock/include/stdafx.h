@@ -23,5 +23,7 @@
 
 #include "types.h"
 
+#include "voxel\ChunkCoordSystems.hpp"
+
 #include "io\FileLoader.h"
 #include "Event.hpp"
