@@ -6,8 +6,8 @@
 #include <ui\InputDispatcher.h>
 #include <ui\InputManager.h>
 #include <procedural\Noise.hpp>
-#include <voxel\ChunkGrid.h>
-#include <voxel\Chunk.h>
+#include <voxel\ChunkGrid.hpp>
+#include <voxel\Chunk.hpp>
 
 #include "Constants.hpp"
 
