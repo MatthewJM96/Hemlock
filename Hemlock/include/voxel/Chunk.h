@@ -1,29 +1,60 @@
 #pragma once
 
+#include "voxel\ChunkMesh.hpp"
+
 namespace hemlock {
     namespace voxel {
-        struct Block {
+        struct Block { // TODO(Matthew): Move elsewhere as this will get big.
             bool present;
         };
 
-        template <int size = 32>
+		enum class BlockChange {
+			PLACE,
+			DESTROY
+		};
+		struct BlockChangeEvent {
+			BlockChange change;
+			BlockChunkPosition blockPos;
+			ChunkRectilinearWorldPosition chunkPos;
+			// Other info like block type etc.
+		};
+
+		struct BulkBlockChangeEvent {
+			const Block* blocks;
+			BlockChunkPosition startPos;
+			ui32 count;
+			ChunkRectilinearWorldPosition chunkPos;
+		};
+
         class Chunk {
-            friend class ChunkMesher;
-        public:
-            void setBlock(BlockPosition pos, Block block) {
-                m_blocks[pos.x + pos.y * size + pos.z * size * size] = block;
-            }
-            void setContiguousBlocks(BlockPosition start, ui32 count, Block* blocks) {
-                std::memcpy(&m_blocks[start.x + start.y * size + start.z * size * size], blocks, count);
-            }
+		public:
+			void init(ui16 size);
+			void dispose();
+			
+			// TODO(Matthew): Schedule chunk meshing task when blocks are set.
+			void setBlock(BlockChunkPosition pos, Block block);
+			void setContiguousBlocks(BlockChunkPosition start, ui32 count, Block* blocks);
+			
+			struct {
+				Chunk* left;
+				Chunk* right;
+				Chunk* top;
+				Chunk* bottom;
+				Chunk* front;
+				Chunk* back;
+			} neighbours;
 
-            // TEMPORARY, DELETE!
-            Block* getBlocks() { return &m_blocks[0]; }
+			Block* blocks; // TODO(Matthew): Compression via RLE?
+
+			ChunkMesh mesh;
+
+			Event<BlockChangeEvent>		onBlockChange	  = Event<BlockChangeEvent>(this);
+			Event<BulkBlockChangeEvent> onBulkBlockChange = Event<BulkBlockChangeEvent>(this);
         private:
-            ChunkPosition m_chunkPosition;
+			ChunkRectilinearWorldPosition m_chunkPosition;
 
-            Block m_blocks[size * size * size]; // TODO(Matthew): Compression via RLE?
-        };
+			ui16 m_size;
+		};
     }
 }
 namespace hvox = hemlock::voxel;
