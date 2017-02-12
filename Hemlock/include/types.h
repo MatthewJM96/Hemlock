@@ -19,6 +19,7 @@ struct TimeData {
     f64 frame;
 };
 
+#undef M_PI // Get rid of M_PI redefinition warnings.
 #define M_TAU  6.28318530717958647692
 #define M_TAUF 6.2831853f
 #define M_PI   M_TAU / 2
