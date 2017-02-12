@@ -177,6 +177,9 @@
     <ClCompile Include="src\Timing.cpp" />
     <ClCompile Include="src\ui\InputDispatcher.cpp" />
     <ClCompile Include="src\ui\InputManager.cpp" />
+    <ClCompile Include="src\voxel\Chunk.cpp" />
+    <ClCompile Include="src\voxel\ChunkGrid.cpp" />
+    <ClCompile Include="src\voxel\ChunkMesher.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\app\IApp.h" />
@@ -203,9 +206,10 @@
     <ClInclude Include="include\ui\Keys.hpp" />
     <ClInclude Include="include\voxel\Chunk.h" />
     <ClInclude Include="include\voxel\ChunkCoordSystems.hpp" />
-    <ClInclude Include="include\voxel\IChunkGenerator.h" />
+    <ClInclude Include="include\voxel\ChunkMesh.hpp" />
+    <ClInclude Include="include\voxel\ChunkMesher.h" />
+    <ClInclude Include="include\voxel\IChunkGenerator.hpp" />
     <ClInclude Include="include\voxel\ChunkGrid.h" />
-    <ClInclude Include="include\voxel\VoxelMesh.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

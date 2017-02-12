@@ -54,6 +54,15 @@
     <ClCompile Include="src\camera\BasicFPSCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\voxel\Chunk.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\voxel\ChunkGrid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\voxel\ChunkMesher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\stdafx.h">
@@ -101,9 +110,6 @@
     <ClInclude Include="include\Hemlock.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\voxel\VoxelMesh.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Timing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -125,16 +131,22 @@
     <ClInclude Include="include\procedural\Noise.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\voxel\ChunkCoordSystems.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\voxel\IChunkGenerator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\voxel\ChunkMesh.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\voxel\Chunk.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\voxel\ChunkGrid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\voxel\ChunkCoordSystems.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\voxel\IChunkGenerator.h">
+    <ClInclude Include="include\voxel\ChunkMesher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
