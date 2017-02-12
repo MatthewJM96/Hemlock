@@ -1,6 +1,6 @@
 #pragma once
 
-#include <voxel\IChunkGenerator.h>
+#include <voxel\IChunkGenerator.hpp>
 
 #include "Constants.hpp"
 
