@@ -17,6 +17,7 @@
 #include <gl\glew.h>
 
 #include <glm\glm.hpp>
+#include <glm\gtc\matrix_transform.hpp>
 
 #include <IL\il.h>
 #include <IL\ilut.h>
