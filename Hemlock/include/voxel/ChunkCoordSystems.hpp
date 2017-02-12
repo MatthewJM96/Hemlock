@@ -14,8 +14,9 @@ namespace hemlock {
 
         // Block position in chunk-space.
         struct BlockChunkPosition {
-            ui8 x, y, z;
+            ui16 x, y, z;
         };
+		using QuadPosition = BlockChunkPosition;
         // Block position in rectilinear world-space.
         struct BlockRectilinearWorldPosition {
             i64 x, y, z;
@@ -23,7 +24,7 @@ namespace hemlock {
 
         // Chunk position in grid-space.
         struct ChunkGridPosition {
-            i64 x, y, z;
+            i32 x, y, z;
         };
         // Chunk position in rectilinear world-space.
         struct ChunkRectilinearWorldPosition {
@@ -31,12 +32,24 @@ namespace hemlock {
         };
         using ChunkID = ChunkRectilinearWorldPosition;
 
+		ui64 getBlockIndex(BlockChunkPosition pos, ui16 size = 32) {
+			return (ui64)pos.x + (ui64)pos.y *  (ui64)size + (ui64)pos.z * (ui64)size *  (ui64)size;
+		}
 
-        // TODO(Matthew): Actually make this work!
-        //template <int size = 32>
-        //glm::i64vec3 getWorldPosition(ChunkPosition chunkPos, BlockPosition blockPos /*= { glm::u32vec3(0) }*/) {
-        //    return glm::i64vec3(chunkPos.x * size + (i32)blockPos.x, chunkPos.y * size + (i32)blockPos.y, chunkPos.z * size + (i32)blockPos.z);
-        //}
+		BlockChunkPosition getBlockChunkPosition(ui64 blockIndex, ui16 size = 32) {
+			ui16 z = (ui16)glm::floor(blockIndex / ((ui64)size * (ui64)size));
+			blockIndex %= ((ui64)size * (ui64)size);
+			ui16 y = (ui16)glm::floor(blockIndex / (ui64)size);
+			ui16 x = (ui16)(blockIndex % (ui64)size);
+			return { x, y, z };
+		}
+
+		BlockRectilinearWorldPosition getRectilinearWorldPosition(ChunkGridPosition chunkPos, BlockChunkPosition blockPos = { 0, 0, 0 }, ui16 size = 32) {
+			return { (i64)chunkPos.x * (i64)size + (i64)blockPos.x, (i64)chunkPos.y * (i64)size + (i64)blockPos.y, (i64)chunkPos.z * (i64)size + (i64)blockPos.z };
+        }
+		BlockRectilinearWorldPosition getRectilinearWorldPosition(ChunkGridPosition chunkPos, ui64 blockIndex = 0, ui16 size = 32) {
+			return getRectilinearWorldPosition(chunkPos, getBlockChunkPosition(blockIndex));
+		}
     }
 }
 namespace hvox = hemlock::voxel;
@@ -44,7 +57,7 @@ namespace hvox = hemlock::voxel;
 // Hash collisions after ~1.6*10^7 chunks in x and z, and after ~6.5*10^4 chunks in y.
 template<>
 struct std::hash<hvox::ChunkID> {
-    std::size_t operator()(const hvox::ChunkID& id) {
+    std::size_t operator()(const hvox::ChunkID& id) const {
         std::hash<ui64> hash;
         return hash(id.x + ((ui64)id.y << 24) + ((ui64)id.z << 40));
     }
