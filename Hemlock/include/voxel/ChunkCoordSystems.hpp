@@ -32,6 +32,10 @@ namespace hemlock {
         };
         using ChunkID = ChunkRectilinearWorldPosition;
 
+		bool operator==(const ChunkID& a, const ChunkID& b) {
+			return (a.x == b.x) && (a.y == b.y) && (a.z == b.z);
+		}
+
 		ui64 getBlockIndex(BlockChunkPosition pos, ui16 size = 32) {
 			return (ui64)pos.x + (ui64)pos.y *  (ui64)size + (ui64)pos.z * (ui64)size *  (ui64)size;
 		}
