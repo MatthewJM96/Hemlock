@@ -2,9 +2,7 @@
 
 #include <voxel\IChunkGenerator.hpp>
 
-#include "Constants.hpp"
-
-class ChunkGenerator : public hvox::IChunkGenerator<CHUNK_SIZE> {
+class ChunkGenerator : public hvox::IChunkGenerator {
 public:
-    void runGenTask(hvox::ChunkGenTask<CHUNK_SIZE> task);
+    void runGenTask(hvox::ChunkGenTask task, ui16 size);
 };

@@ -2,17 +2,13 @@
 
 #include "ChunkGenerator.h"
 
-#include <glm\glm.hpp>
-
 #include <procedural\Noise.hpp>
 
 #include <voxel\Chunk.h>
 #include <voxel\ChunkCoordSystems.hpp>
 
-void ChunkGenerator::runGenTask(hvox::ChunkGenTask<CHUNK_SIZE> task) {
-    hvox::Chunk<CHUNK_SIZE>* chunk = task.chunk;
-    hvox::BlockPosition blockPos{};
-    glm::i64vec3 worldPos = hvox::getWorldPosition<CHUNK_SIZE>(task.pos, blockPos);
+void ChunkGenerator::runGenTask(hvox::ChunkGenTask task, ui16 size) {
+    hvox::Chunk* chunk = task.chunk;
 
     hproc::Noise::NoiseData<f64> smallDetails;
     smallDetails.type = hproc::Noise::Type::RIDGED;
@@ -47,15 +43,15 @@ void ChunkGenerator::runGenTask(hvox::ChunkGenTask<CHUNK_SIZE> task) {
     bigDetails.bound = { 0.0, 200.0 };
     bigDetails.clamp = { 0.0,  0.0 };
 
-    for (ui32 x = 0; x < CHUNK_SIZE; ++x) {
-        for (ui32 y = 0; y < CHUNK_SIZE; ++y) {
-            glm::f64vec2 pos = glm::f64vec2(worldPos.x + x, worldPos.y + y);
-            i64 z = (i64)glm::floor(hproc::Noise::getNoiseValue(pos, smallDetails) + hproc::Noise::getNoiseValue(pos, medDetails) + hproc::Noise::getNoiseValue(pos, bigDetails));
-            z -= worldPos.z;
+    for (ui32 x = 0; x < size; ++x) {
+        for (ui32 z = 0; z < size; ++z) {
+			glm::f64vec2 pos = { task.pos.x + x, task.pos.z + z };
+            i64 y = (i64)glm::floor(hproc::Noise::getNoiseValue(pos, smallDetails) + hproc::Noise::getNoiseValue(pos, medDetails) + hproc::Noise::getNoiseValue(pos, bigDetails));
+            y -= task.pos.z;
             if (z < 0) continue;
-            if (z > CHUNK_SIZE) z = CHUNK_SIZE;
+            if (z > size) z = size;
             for (i64 zP = 0; zP < z; ++zP) {
-                hvox::BlockPosition blockPos = { x, y, zP };
+                hvox::BlockChunkPosition blockPos = { x, y, zP };
                 chunk->setBlock(blockPos, { true });
             }
         }

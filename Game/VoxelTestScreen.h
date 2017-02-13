@@ -6,8 +6,7 @@
 #include <ui\InputDispatcher.h>
 #include <ui\InputManager.h>
 #include <procedural\Noise.hpp>
-#include <voxel\ChunkGrid.hpp>
-#include <voxel\Chunk.hpp>
+#include <voxel\ChunkGrid.h>
 
 #include "Constants.hpp"
 
@@ -30,9 +29,8 @@ private:
     
     GLuint m_texture1;
     GLuint m_texture2;
-    GLuint m_voxVAO;
 
-    hvox::ChunkGrid<CHUNK_SIZE> m_chunkGrid;
+    hvox::ChunkGrid m_chunkGrid;
 
     /*f32* m_heightmap;
     hproc::Noise::NoiseData<f64> m_mapDesc;*/
