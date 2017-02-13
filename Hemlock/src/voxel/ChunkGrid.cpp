@@ -108,7 +108,7 @@ void hvox::ChunkGrid::submitGenTask(ChunkLOD lod, ChunkGenType type, ChunkRectil
 		chunk = (*it).second;
 	}
 
-	m_genTasks.push({ lod, type, pos, chunk });
+	m_genTasks.push({ lod, type, chunk, pos });
 }
 
 void hvox::ChunkGrid::update() {
