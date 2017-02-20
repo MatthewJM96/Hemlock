@@ -4,9 +4,6 @@
 
 #include <procedural\Noise.hpp>
 
-#include <voxel\Chunk.h>
-#include <voxel\ChunkCoordSystems.hpp>
-
 void ChunkGenerator::runGenTask(hvox::ChunkGenTask task, ui16 size) {
     hvox::Chunk* chunk = task.chunk;
 
@@ -51,7 +48,7 @@ void ChunkGenerator::runGenTask(hvox::ChunkGenTask task, ui16 size) {
             if (z < 0) continue;
             if (z > size) z = size;
             for (i64 zP = 0; zP < z; ++zP) {
-                hvox::BlockChunkPosition blockPos = { x, y, zP };
+                hvox::BlockChunkPosition blockPos = { (ui16)x, (ui16)y, (ui16)zP };
                 chunk->setBlock(blockPos, { true });
             }
         }

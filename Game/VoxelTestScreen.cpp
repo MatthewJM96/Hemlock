@@ -157,7 +157,7 @@ void VoxelTestScreen::draw(TimeData time) {
 }
 
 bool VoxelTestScreen::handleMouseMovement(h::Sender sender, hui::MouseMoveEvent event) {
-    m_camera.rotateFromMouse(-event.dx, -event.dy, 0.005f);
+    m_camera.rotateFromMouse(-(f32)event.dx, -(f32)event.dy, 0.005f);
     return false;
 }
 

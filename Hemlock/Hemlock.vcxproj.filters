@@ -63,6 +63,9 @@
     <ClCompile Include="src\voxel\ChunkMesher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\voxel\ChunkCoordSystems.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\stdafx.h">
@@ -131,9 +134,6 @@
     <ClInclude Include="include\procedural\Noise.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\voxel\ChunkCoordSystems.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\voxel\IChunkGenerator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -147,6 +147,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\voxel\ChunkMesher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\voxel\ChunkCoordSystems.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
