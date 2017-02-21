@@ -61,7 +61,7 @@ void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task, ui16 size) {
 			if (isAtLeftFace(i, size)) {
 				// Get corresponding neighbour index in neighbour chunk and check.
 				ui64 j = i + size - 1;
-				if (!task.chunk->neighbours.left->blocks[j].present) {
+				if (task.chunk->neighbours.left == nullptr || !task.chunk->neighbours.left->blocks[j].present) {
 					task.chunk->mesh.quads.push_back({ Face::LEFT, translationMatrix });
 				}
 			} else {
@@ -75,7 +75,7 @@ void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task, ui16 size) {
 			if (isAtRightFace(i, size)) {
 				// Get corresponding neighbour index in neighbour chunk and check.
 				ui64 j = i - size + 1;
-				if (!task.chunk->neighbours.right->blocks[j].present) {
+				if (task.chunk->neighbours.right == nullptr || !task.chunk->neighbours.right->blocks[j].present) {
 					task.chunk->mesh.quads.push_back({ Face::RIGHT, translationMatrix });
 				}
 			} else {
@@ -89,7 +89,7 @@ void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task, ui16 size) {
 			if (isAtTopFace(i, size)) {
 				// Get corresponding neighbour index in neighbour chunk and check.
 				ui64 j = i - (size * (size - 1));
-				if (!task.chunk->neighbours.right->blocks[j].present) {
+				if (task.chunk->neighbours.top == nullptr || !task.chunk->neighbours.top->blocks[j].present) {
 					task.chunk->mesh.quads.push_back({ Face::TOP, translationMatrix });
 				}
 			} else {
@@ -103,7 +103,7 @@ void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task, ui16 size) {
 			if (isAtBottomFace(i, size)) {
 				// Get corresponding neighbour index in neighbour chunk and check.
 				ui64 j = i + (size * (size - 1));
-				if (!task.chunk->neighbours.right->blocks[j].present) {
+				if (task.chunk->neighbours.bottom == nullptr || !task.chunk->neighbours.bottom->blocks[j].present) {
 					task.chunk->mesh.quads.push_back({ Face::BOTTOM, translationMatrix });
 				}
 			} else {
@@ -117,7 +117,7 @@ void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task, ui16 size) {
 			if (isAtFrontFace(i, size)) {
 				// Get corresponding neighbour index in neighbour chunk and check.
 				ui64 j = i + (size * size * (size - 1));
-				if (!task.chunk->neighbours.right->blocks[j].present) {
+				if (task.chunk->neighbours.front == nullptr || !task.chunk->neighbours.front->blocks[j].present) {
 					task.chunk->mesh.quads.push_back({ Face::FRONT, translationMatrix });
 				}
 			} else {
@@ -131,7 +131,7 @@ void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task, ui16 size) {
 			if (isAtBackFace(i, size)) {
 				// Get corresponding neighbour index in neighbour chunk and check.
 				ui64 j = i - (size * size * (size - 1));
-				if (!task.chunk->neighbours.right->blocks[j].present) {
+				if (task.chunk->neighbours.back == nullptr || !task.chunk->neighbours.back->blocks[j].present) {
 					task.chunk->mesh.quads.push_back({ Face::BACK, translationMatrix });
 				}
 			} else {
