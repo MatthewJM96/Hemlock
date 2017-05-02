@@ -1,7 +1,7 @@
 #pragma once
 
 #include <type_traits>
-#include <gl\glew.h>
+#include <gl/glew.h>
 #include "../types.h"
 
 namespace hemlock {

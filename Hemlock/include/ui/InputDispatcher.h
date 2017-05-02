@@ -1,7 +1,7 @@
 #pragma once
 
-#include "graphics\Window.h"
-#include "ui\InputManager.h"
+#include "graphics/Window.h"
+#include "ui/InputManager.h"
 
 namespace hemlock {
     namespace ui {

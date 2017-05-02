@@ -1,8 +1,7 @@
 #include "stdafx.h"
 
-
-#include "io\ImageLoader.h"
-#include "graphics\Texture.h"
+#include "graphics/Texture.h"
+#include "io/ImageLoader.h"
 
 ui32* hg::Texture::load(std::vector<const char*> filepaths, bool mipmap /*= false*/) {
     return load(&filepaths[0], (ui32)filepaths.size());

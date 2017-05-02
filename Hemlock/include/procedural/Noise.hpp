@@ -1,6 +1,6 @@
 #pragma once
 
-#include "maths\Fractal.hpp"
+#include "maths/Fractal.hpp"
 
 namespace hemlock {
     namespace procedural {

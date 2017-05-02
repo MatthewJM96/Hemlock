@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "ui\InputDispatcher.h"
+#include "ui/InputDispatcher.h"
 
 static hui::MouseButton convertmb(ui8 sdlButton) {
     switch (sdlButton) {

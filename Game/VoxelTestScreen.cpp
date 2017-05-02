@@ -2,8 +2,8 @@
 
 #include "VoxelTestScreen.h"
 
-#include <graphics\Mesh.hpp>
-#include <graphics\Texture.h>
+#include <graphics/Mesh.hpp>
+#include <graphics/Texture.h>
 
 #include "ChunkGenerator.h"
 

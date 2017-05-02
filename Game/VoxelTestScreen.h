@@ -1,12 +1,12 @@
 #pragma once
 
-#include <app\IScreen.h>
-#include <camera\BasicFPSCamera.h>
-#include <graphics\GLSLProgram.h>
-#include <ui\InputDispatcher.h>
-#include <ui\InputManager.h>
-#include <procedural\Noise.hpp>
-#include <voxel\ChunkGrid.h>
+#include <app/IScreen.h>
+#include <camera/BasicFPSCamera.h>
+#include <graphics/GLSLProgram.h>
+#include <ui/InputDispatcher.h>
+#include <ui/InputManager.h>
+#include <procedural/Noise.hpp>
+#include <voxel/ChunkGrid.h>
 
 #include "Constants.hpp"
 

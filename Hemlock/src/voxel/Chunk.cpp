@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "voxel\Chunk.h"
+#include "voxel/Chunk.h"
 
 void hvox::Chunk::init(ui16 size) {
 	m_size = size;

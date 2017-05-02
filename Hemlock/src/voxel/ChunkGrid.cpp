@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "voxel\ChunkGrid.h"
+#include "voxel/ChunkGrid.h"
 
 void hvox::ChunkGrid::init(ui16 size, IChunkGenerator* generator, ChunkMesher* mesher) {
 	m_size = size;
@@ -19,7 +19,7 @@ void hvox::ChunkGrid::dispose() {
 }
 
 void hvox::ChunkGrid::submitGenTask(ChunkLOD lod, ChunkGenType type, ChunkRectilinearWorldPosition pos) {
-	auto& it = m_chunks.find(pos);
+	auto it = m_chunks.find(pos);
 	Chunk* chunk = nullptr;
 	if (it == m_chunks.end()) {
 		chunk = new Chunk();

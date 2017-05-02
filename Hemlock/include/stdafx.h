@@ -1,28 +1,38 @@
 #pragma once
 
-#include <vector>
 #include <map>
-#include <unordered_map>
-#include <set>
 #include <queue>
+#include <set>
+#include <tuple>
+#include <unordered_map>
+#include <vector>
 
+#include <cstring>
 #include <string>
 
+#include <algorithm>
 #include <functional>
+#include <memory>
+#include <type_traits>
+#include <utility>
 
 #include <iostream>
 #include <fstream>
 
-#include <sdl\SDL.h>
-#include <gl\glew.h>
+#include <sdl/SDL.h>
+#include <gl/glew.h>
 
-#include <glm\glm.hpp>
-#include <glm\gtc\matrix_transform.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
-#include <IL\il.h>
-#include <IL\ilut.h>
+#include <IL/il.h>
+#define ILUT_USE_OPENGL
+#include <IL/ilut.h>
+
+#define STX_NO_STD_ANY
+#include <Any.hpp>
 
 #include "types.h"
 
-#include "io\FileLoader.h"
+#include "io/FileLoader.h"
 #include "Event.hpp"

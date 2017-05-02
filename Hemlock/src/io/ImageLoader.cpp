@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "io\ImageLoader.h"
+#include "io/ImageLoader.h"
 
 void** hio::Image::allocate(std::vector<ui32> widths, std::vector<ui32> heights, std::vector<Format> formats, std::vector<Type> types, std::vector<ui32>& sizes) {
     if (widths.size() != heights.size() ||

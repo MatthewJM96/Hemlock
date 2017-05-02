@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "voxel\ChunkCoordSystems.h"
+#include "voxel/ChunkCoordSystems.h"
 
 bool hvox::operator==(const ChunkID& a, const ChunkID& b) {
     return (a.x == b.x) && (a.y == b.y) && (a.z == b.z);

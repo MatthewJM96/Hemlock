@@ -2,7 +2,7 @@
 
 #undef min
 #undef max
-#include <glm\glm.hpp>
+#include <glm/glm.hpp>
 //#include <glm\gtx\extended_min_max.hpp>
 
 namespace hemlock {

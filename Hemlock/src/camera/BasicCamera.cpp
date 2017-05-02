@@ -1,9 +1,9 @@
 #include "stdafx.h"
 
-#include "camera\BasicCamera.h"
+#include "camera/BasicCamera.h"
 
-#include <glm\gtc\matrix_transform.hpp>
-#include <glm\gtc\quaternion.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 void hcam::BasicCamera::attachToWindow(hg::Window* window) {
     window->onWindowResize += makeDelegate(*this, &hcam::BasicCamera::handleWindowResize);

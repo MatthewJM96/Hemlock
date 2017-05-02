@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
-#include "ui\InputDispatcher.h"
+#include "ui/InputDispatcher.h"
 
-#include "app\IApp.h"
+#include "app/IApp.h"
 
 void happ::IApp::init() {
     if (m_initialised) return;
@@ -73,7 +73,7 @@ void happ::IApp::run() {
 }
 
 bool happ::IApp::setCurrentScreen(char* name) {
-    auto& it = m_screens.find(name);
+    auto it = m_screens.find(name);
     if (it == m_screens.end()) return false;
 
     if (m_currentScreen != nullptr) {
@@ -140,7 +140,7 @@ void happ::IApp::moveToNextScreen() {
     char* nextScreenName = m_currentScreen->getNextScreen();
     if (nextScreenName == nullptr) m_currentScreen = nullptr;
 
-    auto& it = m_screens.find(nextScreenName);
+    auto it = m_screens.find(nextScreenName);
     if (it == m_screens.end()) {
         m_currentScreen->setNextScreen(nullptr);
         m_currentScreen = nullptr; // TODO(Matthew): Instead of nullptr, maybe a default object that at least linked back to previous screen?
@@ -158,7 +158,7 @@ void happ::IApp::moveToPrevScreen() {
     char* prevScreenName = m_currentScreen->getPrevScreen();
     if (prevScreenName == nullptr) m_currentScreen = nullptr;
 
-    auto& it = m_screens.find(prevScreenName);
+    auto it = m_screens.find(prevScreenName);
     if (it == m_screens.end()) {
         m_currentScreen->setPrevScreen(nullptr);
         m_currentScreen = nullptr; // TODO(Matthew): Instead of nullptr, maybe a default object that at least linked back to "next" screen?

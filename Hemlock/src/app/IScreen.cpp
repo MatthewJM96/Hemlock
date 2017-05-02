@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "app\IScreen.h"
+#include "app/IScreen.h"
 
 void happ::IScreen::init(char* name) {
     if (m_initialised) return;

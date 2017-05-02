@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Timing.h"
-#include "app\IScreen.h"
-#include "graphics\Window.h"
-#include "ui\InputManager.h"
+#include "app/IScreen.h"
+#include "graphics/Window.h"
+#include "ui/InputManager.h"
 
 namespace hemlock {
     namespace app {

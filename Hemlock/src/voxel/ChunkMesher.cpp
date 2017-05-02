@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
-#include "voxel\Chunk.h"
-#include "voxel\ChunkMesher.h"
+#include "voxel/Chunk.h"
+#include "voxel/ChunkMesher.h"
 
 void hvox::ChunkMesher::init() {
 	hg::MeshData3D<f32> vData = {};
@@ -27,26 +27,26 @@ void hvox::ChunkMesher::init() {
 	m_topVAO = hg::createVAO(vData);
 }
 
-static inline bool isAtLeftFace(ui64 index, ui16 size) {
+static inline bool isAtLeftFace(ui64 index, ui64 size) {
 	return (index % size) == 0;
 }
-static inline bool isAtRightFace(ui64 index, ui16 size) {
+static inline bool isAtRightFace(ui64 index, ui64 size) {
 	return ((index + 1) % size) == 0;
 }
-static inline bool isAtFrontFace(ui64 index, ui16 size) {
+static inline bool isAtFrontFace(ui64 index, ui64 size) {
 	return index < (size * size);
 }
-static inline bool isAtBackFace(ui64 index, ui16 size) {
+static inline bool isAtBackFace(ui64 index, ui64 size) {
 	return index >= (size * size * (size - 1));
 }
-static inline bool isAtTopFace(ui64 index, ui16 size) {
+static inline bool isAtTopFace(ui64 index, ui64 size) {
 	return (index % (size * size)) >= (size * (size - 1));
 }
-static inline bool isAtBottomFace(ui64 index, ui16 size) {
+static inline bool isAtBottomFace(ui64 index, ui64 size) {
 	return (index % (size * size)) < size;
 }
 
-void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task, ui16 size) {
+void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task, ui64 size) {
 	// TODO(Matthew): Make this more efficient...
 	//                We should not be iterating over all blocks in a chunk.
 	//                Octree would make this more efficient, as would simply 

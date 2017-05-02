@@ -44,11 +44,13 @@ namespace hemlock {
 }
 namespace hvox = hemlock::voxel;
 
-// Hash collisions after ~1.6*10^7 chunks in x and z, and after ~6.5*10^4 chunks in y.
-template<>
-struct std::hash<hvox::ChunkID> {
-    std::size_t operator()(const hvox::ChunkID& id) const {
-        std::hash<ui64> hash;
-        return hash(id.x + ((ui64)id.y << 24) + ((ui64)id.z << 40));
-    }
-};
+namespace std {
+    // Hash collisions after ~1.6*10^7 chunks in x and z, and after ~6.5*10^4 chunks in y.
+    template<>
+    struct hash<hvox::ChunkID> {
+        std::size_t operator()(const hvox::ChunkID& id) const {
+            std::hash<ui64> hash;
+            return hash(id.x + ((ui64)id.y << 24) + ((ui64)id.z << 40));
+        }
+    };
+}

@@ -2,7 +2,7 @@
 
 #include "ChunkGenerator.h"
 
-#include <procedural\Noise.hpp>
+#include <procedural/Noise.hpp>
 
 void ChunkGenerator::runGenTask(hvox::ChunkGenTask task, ui16 size) {
     hvox::Chunk* chunk = task.chunk;

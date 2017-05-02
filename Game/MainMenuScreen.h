@@ -1,7 +1,7 @@
 #pragma once
 
-#include <ui\InputDispatcher.h>
-#include <app\IScreen.h>
+#include <ui/InputDispatcher.h>
+#include <app/IScreen.h>
 
 class MainMenuScreen : public happ::IScreen {
 public:

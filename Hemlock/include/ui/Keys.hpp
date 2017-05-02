@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sdl\SDL.h>
+#include <sdl/SDL.h>
 
 namespace hemlock {
     namespace ui {

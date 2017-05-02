@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "graphics\GLSLProgram.h"
+#include "graphics/GLSLProgram.h"
 
 GLuint hg::GLSLProgram::m_currentProgram = 0;
 

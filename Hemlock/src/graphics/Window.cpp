@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "graphics\Window.h"
+#include "graphics/Window.h"
 
 hg::WindowError hg::Window::init() {
     if (m_initialised) return WindowError::NONE;

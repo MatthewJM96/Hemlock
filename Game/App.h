@@ -2,8 +2,8 @@
 
 
 #include <Event.hpp>
-#include <ui\InputDispatcher.h>
-#include <app\IApp.h>
+#include <ui/InputDispatcher.h>
+#include <app/IApp.h>
 
 class App : public happ::IApp {
 public:

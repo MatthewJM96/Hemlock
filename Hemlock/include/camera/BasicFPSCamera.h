@@ -1,6 +1,6 @@
 #pragma once
 
-#include "camera\BasicCamera.h"
+#include "camera/BasicCamera.h"
 
 namespace hemlock {
     namespace camera {

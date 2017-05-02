@@ -1,15 +1,15 @@
 #include "stdafx.h"
 
-#include "ui\InputManager.h"
+#include "ui/InputManager.h"
 
-#include "ui\Keys.hpp"
+#include "ui/Keys.hpp"
 
 hui::ButtonState hui::InputManager::getMouseButtonState(ui8 button) {
     return m_mouseButtonStates[button - 1];
 }
 
 hui::ButtonState hui::InputManager::getKeyboardKeyState(PhysicalKey key) {
-    auto& it = m_keyStates.find(key);
+    auto it = m_keyStates.find(key);
     if (it == m_keyStates.end()) return {};
     return (*it).second;
 }
@@ -27,7 +27,7 @@ bool hemlock::ui::InputManager::isPressed(ui8 button) {
 }
 
 bool hemlock::ui::InputManager::isPressed(PhysicalKey key) {
-    auto& it = m_keyStates.find(key);
+    auto it = m_keyStates.find(key);
     if (it == m_keyStates.end()) return false;
     return (*it).second.pressed;
 }
@@ -78,9 +78,11 @@ void hui::InputManager::press(PhysicalKey key) {
         case PhysicalKey::H_SCROLLLOCK:
             m_keyModifierStates.scrllck = !m_keyModifierStates.scrllck;
             break;
+        default:
+            break;
     }
 
-    auto& it = m_keyStates.find(key);
+    auto it = m_keyStates.find(key);
     if (it == m_keyStates.end()) {
         m_keyStates[key] = {
             true,
@@ -124,9 +126,11 @@ void hui::InputManager::release(PhysicalKey key) {
         case PhysicalKey::H_RCMD:
             m_keyModifierStates.rcmd = false;
             break;
+        default:
+            break;
     }
 
-    auto& it = m_keyStates.find(key);
+    auto it = m_keyStates.find(key);
     if (it == m_keyStates.end()) {
         m_keyStates[key] = {
             true,

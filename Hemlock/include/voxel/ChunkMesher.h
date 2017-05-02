@@ -1,7 +1,7 @@
 #pragma once
 
-#include "voxel\ChunkMesh.hpp"
-#include "graphics\Mesh.hpp"
+#include "voxel/ChunkMesh.hpp"
+#include "graphics/Mesh.hpp"
 
 namespace hemlock {
 	namespace voxel {
@@ -68,7 +68,7 @@ namespace hemlock {
 		public:
 			void init();
 
-			void runMeshTask(ChunkMeshTask task, ui16 size);
+			void runMeshTask(ChunkMeshTask task, ui64 size);
 		private:
 			union {
 				GLuint m_quadVAOs[6];

@@ -2,273 +2,313 @@
 
 #include <type_traits>
 
+#include "Delegate.hpp"
+
+// The event systems provide a class that stores a collection of subscribers and that may be invoked.
+// Subscribers are stored as delegates, meaning any variety of different kinds of function pointers and
+// callables can be subscribed to the same event.
+// On triggering a standard event, each subscriber is invoked in order of subscription. For prioritised
+// events, subscribers are invoked in order of priority (lower integer priority value -> called earlier).
+// In the case of prioritised events, a mechanism is provided to allow the last called event to return
+// a value.
+// While typically there are better options than a blind callback system when data must be passed around
+// and callbacks can order themselves and also cause the sequence of callback invocations to break early,
+// it has a use case in such scenarios as probing to see if an action is permissible by all stakeholders.
+//   An example of this is in the case of determining if a game may quit: while the original game may only
+//   have one stakeholder in whether the quit is permissible (the system that also would initiate the quit
+//   process), it is imaginable that mods may become independent stakeholders and so need to be able to
+//   prevent such an event occurring.
+//   Using a priority event, it is trivially implemented by having two events: CanQuit and OnQuit.
+//     CanQuit would be a priority event, which all stakeholders in the quit event could subscribe to
+//     in order to allow or deny the actual quit process, while OnQuit would be a standard event which
+//     would inform subscribers of the quit process occurring, allowing them to perform necessary actions
+//     such as saving script state.
+
 namespace hemlock {
+    // Sender is the object responsible for handling the event, and is stored simply as a void pointer; making things
+    // easier for us and harder for users to do stupid things.
     using Sender = const void*;
 
-    template<typename Ret, typename ...Args>
-    class RDelegate {
-    protected:
-        using GenericFunc = void*;
-        using Executor = Ret(*)(Sender, GenericFunc, Args...);
+    // Subscribers must provide an executor and comparator, for delegates we provide a default
+    // implementation of both at the end of this file.
+    template<typename ReturnType, typename ...Parameters>
+    ReturnType executeDelegate(DelegateAny callback, Sender sender, Parameters... parameters);
+    template<typename ReturnType, typename ...Parameters>
+    bool compareDelegate(DelegateAny callback1, DelegateAny callback2);
+
+    // A useful enumeration of the different event base classes.
+    enum class EventType {
+        EVENT,
+        PRIORITY_EVENT
+    };
+    // Event interface, common to both standard and prioritised events.
+    class IEvent {
     public:
-        RDelegate(Sender target, GenericFunc operation, Executor executor) {
-            m_target = target;
-            m_operation = operation;
-            m_executor = executor;
-        }
-        RDelegate() : m_target(nullptr) {};
-        ~RDelegate() {};
+        // Constructors
+        IEvent(Sender sender = nullptr) :
+            m_sender(sender)
+        { /* Empty */ }
 
-        // Execute delegate's target function.
-        Ret trigger(Args... args) const {
-            return m_executor(m_target, m_operation, args...);
-        }
-        Ret operator()(Args... args) const {
-            return m_executor(m_target, m_operation, args...);
+        // Allows tranferring "ownership" of an event. Use with caution!
+        void setSender(Sender sender) {
+            m_sender = sender;
         }
 
-        // Check if two delegates are equal or not.
-        bool operator==(const RDelegate& delegate) const {
-            return m_target == delegate.m_target && m_operation == delegate.m_operation;
+    // Older MSVC toolsets complain about converting function pointers to void*.
+    #if defined(_MSC_FULL_VER) && (_MSC_FULL_VER < 190000000)
+        using GenericExecutor = void(*)();
+    #else
+        using GenericExecutor = void*;
+    #endif
+        using GenericComparator = bool(*)(DelegateAny, DelegateAny);
+    protected:
+        Sender m_sender;
+    };
+    // Event base class, provides all aspects that don't depend on templated parameters.
+    class EventBase : public IEvent {
+    protected:
+        struct Subscriber {
+            GenericExecutor   executor;
+            GenericComparator comparator;
+            DelegateAny       callback;
+
+            bool operator==(const Subscriber& rhs) {
+                return (this->executor   == rhs.executor)
+                    && (this->comparator == rhs.comparator)
+                    && this->comparator(this->callback, rhs.callback);
+            }
+            bool operator!=(const Subscriber& rhs) {
+                return !(*this == rhs);
+            }
+        };
+        using Subscribers = std::vector<Subscriber>;
+    public:
+        // Constructors
+        EventBase(Sender sender = nullptr) :
+            IEvent(sender)
+        { /* Empty */ }
+
+        // Adds a subscriebr to the event.
+        void add(Subscriber subscriber) {
+            m_subscribers.push_back(subscriber);
         }
-        bool operator!=(const RDelegate& delegate) const {
-            return m_target != delegate.m_target || m_operation != delegate.m_operation;
+        // operator+= is an alias of add.
+        void operator+=(Subscriber subscriber) {
+            add(subscriber);
         }
-        
-        // Static function pointers.
-        static RDelegate create(Ret (*operation)(Args...)) {
-            return RDelegate(nullptr, *(GenericFunc*)&operation, execute);
+
+        // Removes a subscriber from the event (only the first instance found is removed).
+        void remove(Subscriber subscriber) {
+            const auto& it = std::find(m_subscribers.begin(), m_subscribers.end(), subscriber);
+            if (it != m_subscribers.end()) {
+                m_subscribers.erase(it);
+            }
         }
-        // Non-const member function pointers.
-        template<typename T>
-        static RDelegate create(T* target, Ret (T::*operation)(Args...)) {
-            return RDelegate(target, *(GenericFunc*)&operation, executeObj<T>);
-        }
-        // Const member function pointers.
-        template<typename T>
-        static RDelegate create(T* target, Ret (T::*operation)(Args...) const) {
-            return RDelegate(target, *(GenericFunc*)&operation, executeObj<T>);
+        // operator-= is an alias of remove.
+        void operator-=(Subscriber subscriber) {
+            remove(subscriber);
         }
     protected:
-        template<typename T>
-        static Ret executeObj(Sender target, GenericFunc operation, Args... args) {
-            using Func = Ret (T::*)(Args...);
+        Subscribers m_subscribers;
+    };
+    // The standard event class, provides the most trivial event system in which subscribers are invoked in order of
+    // subscription and all subscribers get processed.
+    template <typename ...Parameters>
+    class Event : public EventBase {
+        using Executor   = void(*)(DelegateAny, Sender, Parameters...);
+        using MyDelegate = Delegate<void, Sender, Parameters...>;
+    public:
+        // Constructors
+        Event(Sender sender = nullptr) :
+            EventBase(sender)
+        { /* Empty */ }
 
-            auto targ = (T*)(target);
-            Func op = *(Func*)&operation;
-
-            return (targ->*op)(args...);
+        // Triggers the event, invoking all subscribers.
+        void trigger(Parameters... parameters) {
+            for (auto& subscriber : m_subscribers) {
+                Executor executor = *(Executor*)&subscriber.executor;
+                executor(subscriber.callback, m_sender, parameters...);
+            }
         }
-        static Ret execute(Sender target, GenericFunc operation, Args... args) {
-            using Func = Ret (*)(Args...);
-
-            Func op = *(Func*)&operation;
-
-            return op(args...);
+        // operator() is an alias of trigger.
+        void operator()(Parameters... parameters) {
+            trigger(parameters...);
         }
 
-        Sender m_target;
-        GenericFunc m_operation;
-        Executor m_executor;
+        // A convenience function that adds a delegate subscriber to the event.
+        void add(MyDelegate delegate) {
+            Subscriber subscriber = { (GenericExecutor)&executeDelegate<void, Parameters...>, &compareDelegate<void, Parameters...>, DelegateAny(delegate) };
+            EventBase::add(subscriber);
+        }
+        // operator+= is an alias of add.
+        void operator+=(MyDelegate delegate) {
+            add(delegate);
+        }
+
+        // A convenience function that removes a delegate subscriber from the event (only the first instance found is removed).
+        void remove(MyDelegate delegate) {
+            Subscriber subscriber = { (GenericExecutor)&executeDelegate<void, Parameters...>, &compareDelegate<void, Parameters...>, DelegateAny(delegate) };
+            EventBase::remove(subscriber);
+        }
+        // operator-= is an alias of remove.
+        void operator-=(MyDelegate delegate) {
+            remove(delegate);
+        }
     };
 
-    template<typename ...Args>
-    class Delegate : public RDelegate<void, Args...> {
+    // Prioritised event base class, provides all aspects that don't depend on templated parameters.
+    class PriorityEventBase : public IEvent {
+    protected:
+        struct Subscriber {
+            GenericExecutor   executor;
+            GenericComparator comparator;
+            ui32              priority;
+            DelegateAny       callback;
+
+            bool operator==(const Subscriber& rhs) {
+                return (this->executor   == rhs.executor)
+                    && (this->comparator == rhs.comparator)
+                    && (this->priority   == rhs.priority)
+                    && this->comparator(this->callback, rhs.callback);
+            }
+            bool operator!=(const Subscriber& rhs) {
+                return !(*this == rhs);
+            }
+        };
     public:
-        Delegate(Sender target, GenericFunc operation, Executor executor) {
-            m_target = target;
-            m_operation = operation;
-            m_executor = executor;
+        // Define a comparison function for use in the multiset that stores subscribers.
+        static bool _compare(const Subscriber& a, const Subscriber& b) {
+            return a.priority < b.priority;
+        };
+    protected:
+        using Subscribers = std::multiset<Subscriber, decltype(&_compare)>;
+    public:
+        // Constructors
+        PriorityEventBase(Sender sender = nullptr) :
+            IEvent(sender)
+        { /* Empty */ }
+
+        // Adds a subscriebr to the event.
+        void add(Subscriber subscriber) {
+            m_subscribers.insert(subscriber);
+        }
+        // operator+= is an alias of add.
+        void operator+=(Subscriber subscriber) {
+            add(subscriber);
         }
 
-        // Static function pointers.
-        static Delegate create(void(*operation)(Args...)) {
-            return Delegate(nullptr, *(GenericFunc*)&operation, execute);
+        // Removes a subscriber from the event (only the first instance found is removed).
+        void remove(Subscriber subscriber) {
+            const auto& it = m_subscribers.find(subscriber);
+            if (it != m_subscribers.end()) {
+                m_subscribers.erase(it);
+            }
         }
-        // Non-const member function pointers.
-        template<typename T>
-        static Delegate create(T* target, void(T::*operation)(Args...)) {
-            return Delegate(target, *(GenericFunc*)&operation, executeObj<T>);
+        // operator-= is an alias of remove.
+        void operator-=(Subscriber subscriber) {
+            remove(subscriber);
         }
-        // Const member function pointers.
-        template<typename T>
-        static Delegate create(T* target, void(T::*operation)(Args...) const) {
-            return Delegate(target, *(GenericFunc*)&operation, executeObj<T>);
-        }    
+    protected:
+        Subscribers m_subscribers = Subscribers(&PriorityEventBase::_compare);
     };
-
-    // Static function pointers.
-    template<typename Ret, typename ...Args>
-    RDelegate<Ret, Args...> makeRDelegate(Ret (*operation)(Args...)) {
-        return RDelegate<Ret, Args...>::create(operation);
-    }
-    // Non-const member function pointers.
-    template<typename Ret, typename T, typename ...Args>
-    RDelegate<Ret, Args...> makeRDelegate(T& target, Ret (T::*operation)(Args...)) {
-        return RDelegate<Ret, Args...>::create<T>(&target, operation);
-    }
-    // Const member function pointers.
-    template<typename Ret, typename T, typename ...Args>
-    RDelegate<Ret, Args...> makeRDelegate(T& target, Ret (T::*operation)(Args...) const) {
-        return RDelegate<Ret, Args...>::create<T>(&target, operation);
-    }
-
-    // Static function pointers.
-    template<typename ...Args>
-    Delegate<Args...> makeDelegate(void (*operation)(Args...)) {
-        return Delegate<Args...>::create(operation);
-    }
-    // Non-const member function pointers.
-    template<typename T, typename ...Args>
-    Delegate<Args...> makeDelegate(T& target, void (T::*operation)(Args...)) {
-        return Delegate<Args...>::create<T>(&target, operation);
-    }
-    // Const member function pointers.
-    template<typename T, typename ...Args>
-    Delegate<Args...> makeDelegate(T& target, void (T::*operation)(Args...) const) {
-        return Delegate<Args...>::create<T>(&target, operation);
-    }
-    
-    template<typename DataRet, typename ...Args>
-    class RPriorityEvent {
-    public:
-        using StructRet = struct {
+    // The prioritised event implementation, in particular in the case where some form of data may be returned
+    // by the last invoked subscriber.
+    template<typename DataReturnType, typename ...Parameters>
+    class RPriorityEvent : public PriorityEventBase {
+    protected:
+        // Define the return type in the case that DataReturnType is NOT void.
+        using _ReturnType = struct {
             bool shouldContinue;
-            std::enable_if_t<!std::is_void<DataRet>::value, DataRet> data;
+            // Use std::conditional & std::is_void to avoid trying to have a void type field (disallowed).
+            // Would prefer to use enable_if rather than conditional, but MSVC++ v120 and Clang 3.8 don't support SFINAE completely.
+            typename std::conditional<std::is_void<DataReturnType>::value, void*, DataReturnType>::type data;
         };
-        using Return = typename std::conditional<std::is_void<DataRet>::value, bool, StructRet>::type;
-    private:
-        using Callback = RDelegate<Return, Sender, Args...>;
     public:
-        using PriorityCallback = std::pair<ui32, Callback>;
+        // If DataReturnType is void, define the ReturnType to be bool, else define it to be equal to _ReturnType.
+        using ReturnType         = typename std::conditional<std::is_void<DataReturnType>::value, bool, _ReturnType>::type;
+        using MyDelegate         = Delegate<ReturnType, Sender, Parameters...>;
+        using MyPriorityDelegate = std::pair<ui32, MyDelegate>;
+        using Executor           = ReturnType(*)(DelegateAny, Sender, Parameters...);
 
-        RPriorityEvent(Sender s = nullptr) {
-            m_sender = s;
-        };
-        ~RPriorityEvent() {};
+        // Constructors.
+        RPriorityEvent(Sender sender = nullptr) :
+            PriorityEventBase(sender)
+        { /* EMPTY */ }
 
-        void setSender(Sender s) {
-            m_sender = s;
-        }
-
-        DataRet trigger(Args... a) {
-            Return ret = {};
-            for (auto& callback : m_callbacks) {
-                ret = callback.second(m_sender, a...);
+        // Triggers the event, invoking all subscribers.
+        DataReturnType trigger(Parameters... parameters) {
+            ReturnType ret = {};
+            for (auto& subscriber : m_subscribers) {
+                Executor executor = *(Executor*)&subscriber.executor;
+                ret = executor(subscriber.callback, m_sender, parameters...);
                 if (!ret.shouldContinue) break;
             }
             return ret.data;
         }
-        DataRet operator()(Args... a) {
-            return trigger(a...);
+        // operator() is an alias of trigger.
+        DataReturnType operator()(Parameters... parameters) {
+            return trigger(parameters...);
         }
 
-        void add(PriorityCallback pc) {
-            m_callbacks.insert(pc);
+        // Adds a delegate subscriber to the event.
+        void add(MyPriorityDelegate delegate) {
+            Subscriber subscriber = { (GenericExecutor)&executeDelegate<ReturnType, Parameters...>, &compareDelegate<ReturnType, Parameters...>, delegate.first, DelegateAny(delegate.second) };
+            PriorityEventBase::add(subscriber);
         }
-        void add(Callback c, ui32 p = 0) {
-            add(PriorityCallback(p, c));
-        }
-        void operator+=(PriorityCallback pc) {
-            add(pc);
-        }
-
-        // TODO(Matthew): Surely there's a better way of doing this?
-        void removeAll(Callback c) {
-            for (auto& it = m_callbacks.begin(); it != m_callbacks.end(); ++it) {
-                if ((*it).second == c) {
-                    m_callbacks.erase(it);
-                    removeAll(c);
-                    return;
-                }
-            }
-        }
-        void operator-=(Callback c) {
-            removeAll(c);
-        }
-        void remove(PriorityCallback pc) {
-            for (auto& it = m_callbacks.lower_bound(pc); it != m_callbacks.upper_bound(pc); ++it) {
-                if ((*it).second == pc.second) {
-                    m_callbacks.erase(it);
-                    return;
-                }
-            }
-        }
-        void operator-=(PriorityCallback pc) {
-            remove(pc);
+        // operator+= is an alias of add.
+        void operator+=(MyPriorityDelegate delegate) {
+            add(delegate);
         }
 
-        static bool compare(const PriorityCallback& a, const PriorityCallback& b) {
-            return a.first < b.first;
-        };
-    protected:
-        Sender m_sender;
-
-        using PriorityCallbackList = std::multiset<std::pair<ui32, Callback>, decltype(&compare)>;
-        PriorityCallbackList m_callbacks = PriorityCallbackList(&RPriorityEvent::compare);
+        // Removes a delegate subscriber from the event (only the first instance found is removed).
+        void remove(MyPriorityDelegate delegate) {
+            Subscriber subscriber = { (GenericExecutor)&executeDelegate<ReturnType, Parameters...>, &compareDelegate<ReturnType, Parameters...>, delegate.first, DelegateAny(delegate.second) };
+            PriorityEventBase::remove(subscriber);
+        }
+        // operator-= is an alias of remove.
+        void operator-=(MyPriorityDelegate delegate) {
+            remove(delegate);
+        }
     };
-    template <typename ...Args>
-    class PriorityEvent : public RPriorityEvent<void, Args...> {
+    // Specialisation of prioritised event to handle void data return type.
+    template<typename ...Parameters>
+    class PriorityEvent : public RPriorityEvent<void, Parameters...> {
     public:
-        PriorityEvent(Sender s = nullptr) {
-            m_sender = s;
-        };
-        ~PriorityEvent() {};
+        // Constructors.
+        PriorityEvent(Sender sender = nullptr) :
+            RPriorityEvent<void, Parameters...>(sender)
+        { /* EMPTY */ }
 
-        void trigger(Args... a) {
-            for (auto& callback : m_callbacks) {
-                bool ret = callback.second(m_sender, a...);
-                if (!ret) break;
-            }
-        }
-        void operator()(Args... a) {
-            trigger(a...);
-        }
-    };
-
-    template<typename ...Args>
-    class Event {
-        using Callback = Delegate<Sender, Args...>;
-    public:
-        Event(Sender s = nullptr) {
-            m_sender = s;
-        };
-        ~Event() {};
-
-        void setSender(Sender s) {
-            m_sender = s;
-        }
-
-        void trigger(Args... a) {
-            for (auto& callback : m_callbacks) {
-                callback(m_sender, a...);
-            }
-        }
-        void operator()(Args... a) {
-            trigger(a...);
-        }
-
-        void add(Callback c) {
-            m_callbacks.push_back(c);
-        }
-        void operator+=(Callback c) {
-            add(c);
-        }
-
-        void remove(Callback c) {
-            for (auto& it = m_callbacks.begin(); it != m_callbacks.end(); ++it) {
-                if (*it == c) {
-                    m_callbacks.erase(it);
-                    return;
+        using Executor = bool(*)(DelegateAny, Sender, Parameters...);
+        // Triggers the event, invoking all subscribers.
+        void trigger(Parameters... parameters) {
+            for (auto& subscriber : RPriorityEvent<void, Parameters...>::m_subscribers) {
+                Executor executor = *(Executor*)&subscriber.executor;
+                if (!executor(subscriber.callback, RPriorityEvent<void, Parameters...>::m_sender, parameters...)) {
+                    break;
                 }
             }
         }
-        void operator-=(Callback c) {
-            remove(c);
+        // operator() is an alias of trigger.
+        void operator()(Parameters... parameters) {
+            trigger(parameters...);
         }
-    private:
-        Sender m_sender;
-        std::vector<Callback> m_callbacks;
     };
+
+    template<typename ReturnType, typename ...Parameters>
+    ReturnType executeDelegate(DelegateAny callback, Sender sender, Parameters... parameters) {
+        using MyDelegate = Delegate<ReturnType, Sender, Parameters...>;
+        MyDelegate delegate = delegateAnyCast<MyDelegate>(callback);
+
+        return delegate(sender, parameters...);
+    }
+    template<typename ReturnType, typename ...Parameters>
+    bool compareDelegate(DelegateAny callback1, DelegateAny callback2) {
+        using MyDelegate = Delegate<ReturnType, Sender, Parameters...>;
+        MyDelegate delegate1 = delegateAnyCast<MyDelegate>(callback1);
+        MyDelegate delegate2 = delegateAnyCast<MyDelegate>(callback2);
+
+        return delegate1 == delegate2;
+    }
 }
 namespace h = hemlock;

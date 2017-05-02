@@ -2,11 +2,11 @@
 
 #ifndef HEMLOCK_USING_PCH
 #include "types.h"
-#include <glm\glm.hpp>
+#include <glm/glm.hpp>
 #include "Event.hpp"
 #endif
 
-#include "graphics\Window.h"
+#include "graphics/Window.h"
 
 namespace hemlock {
     namespace camera {

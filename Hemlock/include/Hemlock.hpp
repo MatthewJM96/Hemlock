@@ -2,9 +2,9 @@
 
 #include "stdafx.h"
 
-#include "camera\BasicCamera.h"
-#include "graphics\GLSLProgram.h"
-#include "graphics\Window.h"
+#include "camera/BasicCamera.h"
+#include "graphics/GLSLProgram.h"
+#include "graphics/Window.h"
 
 namespace hemlock {
     void init() {
