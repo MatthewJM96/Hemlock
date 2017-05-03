@@ -7,7 +7,14 @@
 namespace hemlock {
     namespace voxel {
         class ChunkGrid {
+            using GenTasks  = std::queue<ChunkGenTask>;
+            using MeshTasks = std::queue<ChunkMeshTask>;
+            using Chunks    = std::unordered_map<ChunkID, Chunk*>;
         public:
+            ChunkGrid() :
+                m_size(0), m_generator(nullptr), m_mesher(nullptr), m_genTasks(GenTasks()), m_meshTasks(MeshTasks())
+            { /* Empty */ }
+
 			void init(ui16 size, IChunkGenerator* generator, ChunkMesher* mesher);
 			void dispose();
 
@@ -18,15 +25,15 @@ namespace hemlock {
 			void handleBlockChange(Sender sender, BlockChangeEvent event);
 			void handleBulkBlockChange(Sender sender, BulkBlockChangeEvent event);
         private:
-			ui16 m_size;
+			ui16 m_size = 0;
 
-            IChunkGenerator* m_generator;
-			ChunkMesher*	 m_mesher;
+            IChunkGenerator* m_generator = nullptr;
+			ChunkMesher*	 m_mesher = nullptr;
 
-            std::queue<ChunkGenTask>  m_genTasks;
-			std::queue<ChunkMeshTask> m_meshTasks;
+            GenTasks  m_genTasks;
+			MeshTasks m_meshTasks;
 
-            std::unordered_map<ChunkID, Chunk*> m_chunks;
+            Chunks m_chunks;
         };
     }
 }

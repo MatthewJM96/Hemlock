@@ -14,18 +14,18 @@ class VoxelTestScreen : public happ::IScreen {
 public:
     VoxelTestScreen(hui::InputManager* inputManager) : m_inputManager(inputManager) {}
 
-    void init(char* name);
-    void dispose();
+    void init(const char* name) override;
+    void dispose() override;
 
-    void update(TimeData time);
-    void draw(TimeData time);
+    void update(TimeData time) override;
+    void draw(TimeData time) override;
 
     bool handleMouseMovement(h::Sender sender, hui::MouseMoveEvent event);
     bool handleMouseCapture(h::Sender sender, hui::KeyboardButtonEvent event);
 private:
     hcam::BasicFPSCamera  m_camera;
-    hg::GLSLProgram    m_shader;
-    hui::InputManager* m_inputManager;
+    hg::GLSLProgram       m_shader;
+    hui::InputManager*    m_inputManager;
     
     GLuint m_texture1;
     GLuint m_texture2;

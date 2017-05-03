@@ -18,7 +18,7 @@ namespace hemlock {
 
         class GLSLProgram {
         public:
-            typedef std::map<char*, GLuint> AttributeMap;
+            typedef std::map<const char*, GLuint> AttributeMap;
 
             GLSLProgram() {};
             ~GLSLProgram() {};
@@ -52,13 +52,13 @@ namespace hemlock {
 
             bool link();
 
-            void setAttribute(char* name, GLuint index);
-            void setAttributes(std::map<char*, GLuint> attributes);
+            void setAttribute(const char* name, GLuint index);
+            void setAttributes(std::map<const char*, GLuint> attributes);
 
-            GLuint getAttributeLocation(char* name) {
+            GLuint getAttributeLocation(const char* name) {
                 return m_attributes.at(name);
             }
-            GLuint getUniformLocation(char* name);
+            GLuint getUniformLocation(const char* name);
 
             void use();
             static void unuse();
@@ -69,7 +69,7 @@ namespace hemlock {
         private:
             void shaderError();
 
-            GLuint m_id = 0;
+            GLuint m_id   = 0;
             GLuint m_idVS = 0;
             GLuint m_idFS = 0;
 

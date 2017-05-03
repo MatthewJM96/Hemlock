@@ -5,7 +5,7 @@ ARFLAGS = rcs
 STD     = c++1z
 INCLUDE = -Iinclude/ -Iinclude/app/ -Iinclude/camera/ -Iinclude/graphics/ -Iinclude/io/ -Iinclude/script/ -Iinclude/maths/ -Iinclude/procedural/ -Iinclude/ui/ -Iinclude/voxel/  -I../deps/include/
 OPT     = -Og
-CFLAGS  = -Wall -g $(OPT) -std=$(STD) $(INCLUDE)
+CFLAGS  = -Wall -g -ggdb $(OPT) -std=$(STD) $(INCLUDE)
 
 #LDIR    = -L../deps/libs/
 #LIBS    = #-l:liblua.a -ldl
@@ -24,8 +24,8 @@ OBJDIR  = obj/
 OBJS    = $(SRCS:.cpp=.o)
 
 
-LIB     = Hemlock_$(CC)_$(STD).a
-RED_LIB = Hemlock.a
+LIB     = libHemlock_$(CC)_$(STD).a
+RED_LIB = libHemlock.a
 
 .PHONY: clean
 

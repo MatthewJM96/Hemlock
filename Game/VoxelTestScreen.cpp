@@ -7,7 +7,7 @@
 
 #include "ChunkGenerator.h"
 
-void VoxelTestScreen::init(char* name) {
+void VoxelTestScreen::init(const char* name) {
     if (m_initialised) return;
     IScreen::init(name);
 
@@ -15,8 +15,8 @@ void VoxelTestScreen::init(char* name) {
     m_camera.setFov(45.0f);
     m_camera.update();
 
-    hui::InputDispatcher::getInstance()->onMouseMove += { 2, h::makeRDelegate(*this, &VoxelTestScreen::handleMouseMovement) };
-    hui::InputDispatcher::getInstance()->onKeyboardButtonDown += { 2, h::makeRDelegate(*this, &VoxelTestScreen::handleMouseCapture) };
+    hui::InputDispatcher::getInstance()->onMouseMove += { 2, h::makeDelegate(*this, &VoxelTestScreen::handleMouseMovement) };
+    hui::InputDispatcher::getInstance()->onKeyboardButtonDown += { 2, h::makeDelegate(*this, &VoxelTestScreen::handleMouseCapture) };
 
     m_shader.init();
     m_shader.addShaders("shaders/simple.frag", "shaders/simple.vert");
@@ -59,7 +59,7 @@ void VoxelTestScreen::dispose() {
 
 void VoxelTestScreen::update(TimeData time) {
     f32 speed = 0.1f;
-    auto& modifiers = m_inputManager->getCurrentKeyModifierState();
+    const auto& modifiers = m_inputManager->getCurrentKeyModifierState();
     if (modifiers.lctrl) {
         speed *= 5;
     }

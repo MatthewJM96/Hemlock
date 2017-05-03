@@ -5,11 +5,11 @@
 
 class MainMenuScreen : public happ::IScreen {
 public:
-    void init(char* name);
-    void dispose();
+    void init(const char* name) override;
+    void dispose() override;
 
-    void update(TimeData time);
-    void draw(TimeData time);
+    void update(TimeData time) override;
+    void draw(TimeData time) override;
 
 private:
 };

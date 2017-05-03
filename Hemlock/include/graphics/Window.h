@@ -63,7 +63,7 @@ namespace hemlock {
             friend class hemlock::ui::InputDispatcher;
             typedef std::map<ui8, std::vector<WindowDimensions>> WindowDimensionMap;
         public:
-            Window(WindowSettings settings) : m_window(nullptr), m_settings(settings), m_aspectRatioString(nullptr) {}
+            Window(WindowSettings settings) : m_initialised(false), m_window(nullptr), m_settings(settings), m_aspectRatioString(nullptr) {}
             Window() : Window(DEFAULT_WINDOW_SETTINGS) {}
             Window(char* name, ui32 width, ui32 height, ui8 screenIndex = DEFAULT_WINDOW_SETTINGS.screenIndex, bool fullscreen = DEFAULT_WINDOW_SETTINGS.fullscreen,
                     bool resizable = DEFAULT_WINDOW_SETTINGS.resizable, bool borderless = DEFAULT_WINDOW_SETTINGS.borderless, bool maximised = DEFAULT_WINDOW_SETTINGS.maximised,

@@ -103,8 +103,8 @@ namespace hemlock {
 #define Kzo 0.416666666667 // 1/2-1/6*2
 #define jitter 1.0 // Lower values gives more regular patterns.
 
-                FXXv3 Pi = mod289(floor(P));
-                FXXv3 Pf = glm::fract(P) - 0.5;
+                FXXv3 Pi = mod289(floor(coords));
+                FXXv3 Pf = glm::fract(coords) - 0.5;
 
                 FXXv3 Pfx = Pf.x + FXXv3(1.0, 0.0, -1.0);
                 FXXv3 Pfy = Pf.y + FXXv3(1.0, 0.0, -1.0);
@@ -334,81 +334,6 @@ namespace hemlock {
                 { 2,0,1,3 },{ 0,0,0,0 },{ 0,0,0,0 },{ 0,0,0,0 },{ 3,0,1,2 },{ 3,0,2,1 },{ 0,0,0,0 },{ 3,1,2,0 },
                 { 2,1,0,3 },{ 0,0,0,0 },{ 0,0,0,0 },{ 0,0,0,0 },{ 3,1,0,2 },{ 0,0,0,0 },{ 3,2,0,1 },{ 3,2,1,0 }
             };
-
-            // Could probably reduce code repetitiveness if we used templates even more clever-like...
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
-            FXX genSimplexWithOctaves(ui8 octaves, FXX persistence, FXX scale, glm::tvec2<FXX, glm::highp> coords) {
-                FXX total = (FXX)0.0;
-                FXX frequency = scale;
-                FXX amplitude = (FXX)1.0;
-
-                // We have to keep track of the largest possible amplitude,
-                // because each octave adds more, and we need a value in [-1, 1].
-                FXX maxAmplitude = (FXX)0.0;
-
-                for (ui8 i = 0; i < octaves; ++i) {
-                    total += genSimplex(coords * frequency) * amplitude;
-
-                    frequency *= (FXX)2.0;
-                    maxAmplitude += amplitude;
-                    amplitude *= persistence;
-                }
-
-                return total / maxAmplitude;
-            }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
-            FXX genSimplexWithOctaves(ui8 octaves, FXX persistence, FXX scale, glm::tvec3<FXX, glm::highp> coords) {
-                FXX total = (FXX)0.0;
-                FXX frequency = scale;
-                FXX amplitude = (FXX)1.0;
-
-                // We have to keep track of the largest possible amplitude,
-                // because each octave adds more, and we need a value in [-1, 1].
-                FXX maxAmplitude = (FXX)0.0;
-
-                for (ui8 i = 0; i < octaves; ++i) {
-                    total += genSimplex(coords * frequency) * amplitude;
-
-                    frequency *= (FXX)2.0;
-                    maxAmplitude += amplitude;
-                    amplitude *= persistence;
-                }
-
-                return total / maxAmplitude;
-            }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
-            FXX genSimplexWithOctaves(ui8 octaves, FXX persistence, FXX scale, glm::tvec4<FXX, glm::highp> coords) {
-                FXX total = (FXX)0.0;
-                FXX frequency = scale;
-                FXX amplitude = (FXX)1.0;
-
-                // We have to keep track of the largest possible amplitude,
-                // because each octave adds more, and we need a value in [-1, 1].
-                FXX maxAmplitude = (FXX)0.0;
-
-                for (ui8 i = 0; i < octaves; ++i) {
-                    total += genSimplex(coords * frequency) * amplitude;
-
-                    frequency *= (FXX)2.0;
-                    maxAmplitude += amplitude;
-                    amplitude *= persistence;
-                }
-
-                return total / maxAmplitude;
-            }
-
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
-            FXX genSimplexWithOctavesScaled(ui8 octaves, FXX persistence, FXX scale, FXX loBound, FXX hiBound, glm::tvec2<FXX, glm::highp> coords) {
-                return genSimplexWithOctaves(octaves, persistence, scale, coords) * (hiBound - loBound) / (FXX)2.0 + (hiBound + loBound) / (FXX)2.0;
-            }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
-            FXX genSimplexWithOctavesScaled(ui8 octaves, FXX persistence, FXX scale, FXX loBound, FXX hiBound, glm::tvec3<FXX, glm::highp> coords) {
-                return genSimplexWithOctaves(octaves, persistence, scale, coords) * (hiBound - loBound) / (FXX)2.0 + (hiBound + loBound) / (FXX)2.0;
-            }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
-            FXX genSimplexWithOctavesScaled(ui8 octaves, FXX persistence, FXX scale, FXX loBound, FXX hiBound, glm::tvec4<FXX, glm::highp> coords) {
-                return genSimplexWithOctaves(octaves, persistence, scale, coords) * (hiBound - loBound) / (FXX)2.0 + (hiBound + loBound) / (FXX)2.0;
-            }
 
             template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
             static inline int fastfloor(const FXX x) { return x > 0 ? (int)x : (int)x - 1; }
@@ -779,6 +704,81 @@ namespace hemlock {
             template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
             FXX genSimplexScaled(FXX loBound, FXX hiBound, glm::tvec4<FXX, glm::highp> coords) {
                 return genSimplex(coords) * (hiBound - loBound) / (FXX)2.0 + (hiBound + loBound) / (FXX)2.0;
+            }
+
+            // Could probably reduce code repetitiveness if we used templates even more clever-like...
+            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            FXX genSimplexWithOctaves(ui8 octaves, FXX persistence, FXX scale, glm::tvec2<FXX, glm::highp> coords) {
+                FXX total = (FXX)0.0;
+                FXX frequency = scale;
+                FXX amplitude = (FXX)1.0;
+
+                // We have to keep track of the largest possible amplitude,
+                // because each octave adds more, and we need a value in [-1, 1].
+                FXX maxAmplitude = (FXX)0.0;
+
+                for (ui8 i = 0; i < octaves; ++i) {
+                    total += genSimplex(coords * frequency) * amplitude;
+
+                    frequency *= (FXX)2.0;
+                    maxAmplitude += amplitude;
+                    amplitude *= persistence;
+                }
+
+                return total / maxAmplitude;
+            }
+            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            FXX genSimplexWithOctaves(ui8 octaves, FXX persistence, FXX scale, glm::tvec3<FXX, glm::highp> coords) {
+                FXX total = (FXX)0.0;
+                FXX frequency = scale;
+                FXX amplitude = (FXX)1.0;
+
+                // We have to keep track of the largest possible amplitude,
+                // because each octave adds more, and we need a value in [-1, 1].
+                FXX maxAmplitude = (FXX)0.0;
+
+                for (ui8 i = 0; i < octaves; ++i) {
+                    total += genSimplex(coords * frequency) * amplitude;
+
+                    frequency *= (FXX)2.0;
+                    maxAmplitude += amplitude;
+                    amplitude *= persistence;
+                }
+
+                return total / maxAmplitude;
+            }
+            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            FXX genSimplexWithOctaves(ui8 octaves, FXX persistence, FXX scale, glm::tvec4<FXX, glm::highp> coords) {
+                FXX total = (FXX)0.0;
+                FXX frequency = scale;
+                FXX amplitude = (FXX)1.0;
+
+                // We have to keep track of the largest possible amplitude,
+                // because each octave adds more, and we need a value in [-1, 1].
+                FXX maxAmplitude = (FXX)0.0;
+
+                for (ui8 i = 0; i < octaves; ++i) {
+                    total += genSimplex(coords * frequency) * amplitude;
+
+                    frequency *= (FXX)2.0;
+                    maxAmplitude += amplitude;
+                    amplitude *= persistence;
+                }
+
+                return total / maxAmplitude;
+            }
+
+            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            FXX genSimplexWithOctavesScaled(ui8 octaves, FXX persistence, FXX scale, FXX loBound, FXX hiBound, glm::tvec2<FXX, glm::highp> coords) {
+                return genSimplexWithOctaves(octaves, persistence, scale, coords) * (hiBound - loBound) / (FXX)2.0 + (hiBound + loBound) / (FXX)2.0;
+            }
+            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            FXX genSimplexWithOctavesScaled(ui8 octaves, FXX persistence, FXX scale, FXX loBound, FXX hiBound, glm::tvec3<FXX, glm::highp> coords) {
+                return genSimplexWithOctaves(octaves, persistence, scale, coords) * (hiBound - loBound) / (FXX)2.0 + (hiBound + loBound) / (FXX)2.0;
+            }
+            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            FXX genSimplexWithOctavesScaled(ui8 octaves, FXX persistence, FXX scale, FXX loBound, FXX hiBound, glm::tvec4<FXX, glm::highp> coords) {
+                return genSimplexWithOctaves(octaves, persistence, scale, coords) * (hiBound - loBound) / (FXX)2.0 + (hiBound + loBound) / (FXX)2.0;
             }
         }
     }

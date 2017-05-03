@@ -2,7 +2,7 @@
 
 #include "app/IScreen.h"
 
-void happ::IScreen::init(char* name) {
+void happ::IScreen::init(const char* name) {
     if (m_initialised) return;
     m_initialised = true;
 

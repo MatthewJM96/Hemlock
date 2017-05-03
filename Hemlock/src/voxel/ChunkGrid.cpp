@@ -3,9 +3,9 @@
 #include "voxel/ChunkGrid.h"
 
 void hvox::ChunkGrid::init(ui16 size, IChunkGenerator* generator, ChunkMesher* mesher) {
-	m_size = size;
+	m_size      = size;
 	m_generator = generator;
-	m_mesher = mesher;
+	m_mesher    = mesher;
 }
 
 void hvox::ChunkGrid::dispose() {
@@ -108,7 +108,7 @@ void hvox::ChunkGrid::submitGenTask(ChunkLOD lod, ChunkGenType type, ChunkRectil
 		chunk = (*it).second;
 	}
 
-	m_genTasks.push({ lod, type, chunk, pos });
+	m_genTasks.push({ lod, type, chunk, { pos } });
 }
 
 void hvox::ChunkGrid::update() {
@@ -124,14 +124,14 @@ void hvox::ChunkGrid::update() {
 
 void hvox::ChunkGrid::handleBlockChange(h::Sender sender, BlockChangeEvent event) {
 	m_meshTasks.push({
-		event.chunkPos,
+		{ event.chunkPos },
 		(Chunk*)sender
 	});
 }
 
 void hvox::ChunkGrid::handleBulkBlockChange(h::Sender sender, BulkBlockChangeEvent event) {
 	m_meshTasks.push({
-		event.chunkPos,
+	 	{ event.chunkPos },
 		(Chunk*)sender
 	});
 }

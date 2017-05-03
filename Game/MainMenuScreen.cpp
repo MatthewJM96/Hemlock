@@ -2,10 +2,9 @@
 
 #include "MainMenuScreen.h"
 
-void MainMenuScreen::init(char* name) {
+void MainMenuScreen::init(const char* name) {
     if (m_initialised) return;
     IScreen::init(name);
-
 }
 
 void MainMenuScreen::dispose() {

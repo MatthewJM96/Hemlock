@@ -72,7 +72,7 @@ void happ::IApp::run() {
     }
 }
 
-bool happ::IApp::setCurrentScreen(char* name) {
+bool happ::IApp::setCurrentScreen(const char* name) {
     auto it = m_screens.find(name);
     if (it == m_screens.end()) return false;
 
@@ -137,7 +137,7 @@ bool happ::IApp::handleCurrentScreenRequests() {
 void happ::IApp::moveToNextScreen() {
     if (m_currentScreen == nullptr) return;
 
-    char* nextScreenName = m_currentScreen->getNextScreen();
+    const char* nextScreenName = m_currentScreen->getNextScreen();
     if (nextScreenName == nullptr) m_currentScreen = nullptr;
 
     auto it = m_screens.find(nextScreenName);
@@ -155,7 +155,7 @@ void happ::IApp::moveToNextScreen() {
 void happ::IApp::moveToPrevScreen() {
     if (m_currentScreen == nullptr) return;
 
-    char* prevScreenName = m_currentScreen->getPrevScreen();
+    const char* prevScreenName = m_currentScreen->getPrevScreen();
     if (prevScreenName == nullptr) m_currentScreen = nullptr;
 
     auto it = m_screens.find(prevScreenName);

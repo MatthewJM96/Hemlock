@@ -138,7 +138,7 @@ bool hg::GLSLProgram::link() {
     return true;
 }
 
-void hg::GLSLProgram::setAttribute(char* name, GLuint index) {
+void hg::GLSLProgram::setAttribute(const char* name, GLuint index) {
     if (!isEditable()) {
         puts("Attributes may not be set before program is created or after is has been linked.\n");
         return;
@@ -148,7 +148,7 @@ void hg::GLSLProgram::setAttribute(char* name, GLuint index) {
     m_attributes[name] = index;
 }
 
-void hg::GLSLProgram::setAttributes(std::map<char*, GLuint> attributes) {
+void hg::GLSLProgram::setAttributes(std::map<const char*, GLuint> attributes) {
     if (!isEditable()) {
         puts("Attributes may not be set before program is created or after is has been linked.\n");
         return;
@@ -160,7 +160,7 @@ void hg::GLSLProgram::setAttributes(std::map<char*, GLuint> attributes) {
     }
 }
 
-GLuint hg::GLSLProgram::getUniformLocation(char* name) {
+GLuint hg::GLSLProgram::getUniformLocation(const char* name) {
     // TODO(Matthew): If we add shaders from source instead of filepath, could parse location of uniforms that explicitly set it using "layout(location = X)".
     if (!isLinked()) {
         puts("Cannot find location of uniform until the program has been linked!");

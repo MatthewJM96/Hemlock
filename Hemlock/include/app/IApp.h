@@ -9,8 +9,8 @@ namespace hemlock {
     namespace app {
         class IApp {
         protected:
-            typedef std::unordered_map<char*, IScreen*> ScreenList;
-            typedef std::pair<char*, IScreen*> Screen;
+            typedef std::unordered_map<const char*, IScreen*> ScreenList;
+            typedef std::pair<const char*, IScreen*> Screen;
         public:
             IApp() : m_window(nullptr), m_currentScreen(nullptr) {};
             ~IApp() {};
@@ -22,7 +22,7 @@ namespace hemlock {
 
             virtual void run();
 
-            bool setCurrentScreen(char* name);
+            bool setCurrentScreen(const char* name);
 
             virtual void quit();
         protected:      

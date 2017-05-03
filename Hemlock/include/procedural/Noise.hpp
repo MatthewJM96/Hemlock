@@ -70,7 +70,6 @@ namespace hemlock {
 
             template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
             static inline FXX doOp(Operation op, FXX a, FXX b) {
-                using namespace hproc::Noise;
                 switch (op) {
                     case Operation::ADD:
                         return a + b;
@@ -512,6 +511,8 @@ namespace hemlock {
                     case Type::CELLULAR_CUBIC:
                         res = getCellularCubicNoiseValue(coords, data);
                         break;
+                    default:
+                        break;
                 }
 
                 doOp(modOp, res, data.modifier);
@@ -519,12 +520,18 @@ namespace hemlock {
                 switch (data.multiplier) {
                     case Multiplier::SQUARE:
                         res = res * res;
+                        break;
                     case Multiplier::CUBIC:
                         res = res * res * res;
+                        break;
                     case Multiplier::QUARTIC:
                         res = res * res * res * res;
+                        break;
                     case Multiplier::QUINTIC:
                         res = res * res * res * res * res;
+                        break;
+                    default:
+                        break;
                 }
 
                 res = res * (data.bound.hi - data.bound.lo) * (FXX)0.5 + (data.bound.hi + data.bound.lo) * (FXX)0.5;
@@ -552,7 +559,7 @@ namespace hemlock {
                     res = *start;
                 }
 
-                switch (type) {
+                switch (data.type) {
                     case Type::RAW:
                         res = getRawNoiseValue(coords, data);
                         break;
@@ -568,19 +575,27 @@ namespace hemlock {
                     case Type::CELLULAR:
                         res = getCellularNoiseValue(coords, data);
                         break;
+                    default:
+                        break;
                 }
 
-                doOp(modOp, res, modifier);
+                doOp(modOp, res, data.modifier);
 
                 switch (data.multiplier) {
                     case Multiplier::SQUARE:
                         res = res * res;
+                        break;
                     case Multiplier::CUBIC:
                         res = res * res * res;
+                        break;
                     case Multiplier::QUARTIC:
                         res = res * res * res * res;
+                        break;
                     case Multiplier::QUINTIC:
                         res = res * res * res * res * res;
+                        break;
+                    default:
+                        break;
                 }
 
                 res = res * (data.bound.hi - data.bound.lo) * (FXX)0.5 + (data.bound.hi + data.bound.lo) * (FXX)0.5;
@@ -608,7 +623,7 @@ namespace hemlock {
                     res = *start;
                 }
 
-                switch (type) {
+                switch (data.type) {
                     case Type::RAW:
                         res = getRawNoiseValue(coords, data);
                         break;
@@ -624,19 +639,27 @@ namespace hemlock {
                     case Type::CELLULAR:
                         res = getCellularNoiseValue(coords, data);
                         break;
+                    default:
+                        break;
                 }
 
-                doOp(modOp, res, modifier);
+                doOp(modOp, res, data.modifier);
 
                 switch (data.multiplier) {
                     case Multiplier::SQUARE:
                         res = res * res;
+                        break;
                     case Multiplier::CUBIC:
                         res = res * res * res;
+                        break;
                     case Multiplier::QUARTIC:
                         res = res * res * res * res;
+                        break;
                     case Multiplier::QUINTIC:
                         res = res * res * res * res * res;
+                        break;
+                    default:
+                        break;
                 }
 
                 res = res * (data.bound.hi - data.bound.lo) * (FXX)0.5 + (data.bound.hi + data.bound.lo) * (FXX)0.5;
