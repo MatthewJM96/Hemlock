@@ -186,6 +186,7 @@
     <ClInclude Include="include\app\IApp.h" />
     <ClInclude Include="include\camera\BasicCamera.h" />
     <ClInclude Include="include\camera\BasicFPSCamera.h" />
+    <ClInclude Include="include\Delegate.hpp" />
     <ClInclude Include="include\Event.hpp" />
     <ClInclude Include="include\graphics\GLSLProgram.h" />
     <ClInclude Include="include\app\IScreen.h" />

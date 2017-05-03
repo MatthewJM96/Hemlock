@@ -13,97 +13,16 @@ void hvox::ChunkGrid::dispose() {
 	m_generator = nullptr;
 	m_mesher    = nullptr;
 
-	std::queue<ChunkGenTask>().swap(m_genTasks);
-	std::queue<ChunkMeshTask>().swap(m_meshTasks);
-	std::unordered_map<ChunkID, Chunk*>().swap(m_chunks);
+    GenTasks().swap(m_genTasks);
+	MeshTasks().swap(m_meshTasks);
+	Chunks().swap(m_chunks);
 }
 
 void hvox::ChunkGrid::submitGenTask(ChunkLOD lod, ChunkGenType type, ChunkRectilinearWorldPosition pos) {
 	auto it = m_chunks.find(pos);
 	Chunk* chunk = nullptr;
 	if (it == m_chunks.end()) {
-		chunk = new Chunk();
-		chunk->init(m_size);
-		m_chunks[pos] = chunk;
-
-		chunk->onBlockChange += makeDelegate(*this, &ChunkGrid::handleBlockChange);
-		chunk->onBulkBlockChange += makeDelegate(*this, &ChunkGrid::handleBulkBlockChange);
-
-		Chunk* temp = nullptr;
-		ChunkRectilinearWorldPosition neighbourPos = pos;
-
-		// Update neighbours with info of new chunk.
-		// LEFT
-		neighbourPos = pos;
-		neighbourPos.x -= 1;
-		it = m_chunks.find(neighbourPos);
-		if (it != m_chunks.end()) {
-			temp = (*it).second;
-			chunk->neighbours.left = temp;
-			temp->neighbours.right = chunk;
-		} else {
-			chunk->neighbours.left = nullptr;
-		}
-
-		// RIGHT
-		neighbourPos = pos;
-		neighbourPos.x += 1;
-		it = m_chunks.find(neighbourPos);
-		if (it != m_chunks.end()) {
-			temp = (*it).second;
-			chunk->neighbours.right = temp;
-			temp->neighbours.left = chunk;
-		} else {
-			chunk->neighbours.right = nullptr;
-		}
-
-		// TOP
-		neighbourPos = pos;
-		neighbourPos.y += 1;
-		it = m_chunks.find(neighbourPos);
-		if (it != m_chunks.end()) {
-			temp = (*it).second;
-			chunk->neighbours.top = temp;
-			temp->neighbours.bottom = chunk;
-		} else {
-			chunk->neighbours.top = nullptr;
-		}
-
-		// BOTTOM
-		neighbourPos = pos;
-		neighbourPos.y -= 1;
-		it = m_chunks.find(neighbourPos);
-		if (it != m_chunks.end()) {
-			temp = (*it).second;
-			chunk->neighbours.bottom = temp;
-			temp->neighbours.top = chunk;
-		} else {
-			chunk->neighbours.bottom = nullptr;
-		}
-
-		// FRONT
-		neighbourPos = pos;
-		neighbourPos.z -= 1;
-		it = m_chunks.find(neighbourPos);
-		if (it != m_chunks.end()) {
-			temp = (*it).second;
-			chunk->neighbours.front = temp;
-			temp->neighbours.back = chunk;
-		} else {
-			chunk->neighbours.front = nullptr;
-		}
-
-		// BACK
-		neighbourPos = pos;
-		neighbourPos.z += 1;
-		it = m_chunks.find(neighbourPos);
-		if (it != m_chunks.end()) {
-			temp = (*it).second;
-			chunk->neighbours.back = temp;
-			temp->neighbours.front = chunk;
-		} else {
-			chunk->neighbours.back = nullptr;
-		}
+        chunk = createChunk(pos);
 	} else {
 		chunk = (*it).second;
 	}
@@ -123,6 +42,8 @@ void hvox::ChunkGrid::update() {
 }
 
 void hvox::ChunkGrid::handleBlockChange(h::Sender sender, BlockChangeEvent event) {
+    // TODO(Matthew): We really shouldn't be submitting a mesh task for each block change...
+    //                We want one mesh task per chunk per frame AT MOST regardless of number of blocks changed.
 	m_meshTasks.push({
 		{ event.chunkPos },
 		(Chunk*)sender
@@ -130,8 +51,101 @@ void hvox::ChunkGrid::handleBlockChange(h::Sender sender, BlockChangeEvent event
 }
 
 void hvox::ChunkGrid::handleBulkBlockChange(h::Sender sender, BulkBlockChangeEvent event) {
+    // TODO(Matthew): We really shouldn't be submitting a mesh task for each block change...
+    //                We want one mesh task per chunk per frame AT MOST regardless of number of blocks changed.
 	m_meshTasks.push({
 	 	{ event.chunkPos },
 		(Chunk*)sender
 	});
+}
+
+hvox::Chunk* hvox::ChunkGrid::createChunk(ChunkRectilinearWorldPosition pos) {
+    Chunk* chunk = new Chunk();
+    chunk->init(m_size, pos);
+    m_chunks[pos] = chunk;
+
+    chunk->onBlockChange += makeDelegate(*this, &ChunkGrid::handleBlockChange);
+    chunk->onBulkBlockChange += makeDelegate(*this, &ChunkGrid::handleBulkBlockChange);
+
+    establishChunkNeighbours(chunk, pos);
+
+    return chunk;
+}
+
+void hvox::ChunkGrid::establishChunkNeighbours(Chunk* chunk, ChunkRectilinearWorldPosition pos) {
+    Chunk* temp = nullptr;
+    ChunkRectilinearWorldPosition neighbourPos;
+
+    // Update neighbours with info of new chunk.
+    // LEFT
+    neighbourPos = pos;
+    neighbourPos.x -= 1;
+    auto it = m_chunks.find(neighbourPos);
+    if (it != m_chunks.end()) {
+        temp = (*it).second;
+        chunk->neighbours.left = temp;
+        temp->neighbours.right = chunk;
+    } else {
+        chunk->neighbours.left = nullptr;
+    }
+
+    // RIGHT
+    neighbourPos = pos;
+    neighbourPos.x += 1;
+    it = m_chunks.find(neighbourPos);
+    if (it != m_chunks.end()) {
+        temp = (*it).second;
+        chunk->neighbours.right = temp;
+        temp->neighbours.left = chunk;
+    } else {
+        chunk->neighbours.right = nullptr;
+    }
+
+    // TOP
+    neighbourPos = pos;
+    neighbourPos.y += 1;
+    it = m_chunks.find(neighbourPos);
+    if (it != m_chunks.end()) {
+        temp = (*it).second;
+        chunk->neighbours.top = temp;
+        temp->neighbours.bottom = chunk;
+    } else {
+        chunk->neighbours.top = nullptr;
+    }
+
+    // BOTTOM
+    neighbourPos = pos;
+    neighbourPos.y -= 1;
+    it = m_chunks.find(neighbourPos);
+    if (it != m_chunks.end()) {
+        temp = (*it).second;
+        chunk->neighbours.bottom = temp;
+        temp->neighbours.top = chunk;
+    } else {
+        chunk->neighbours.bottom = nullptr;
+    }
+
+    // FRONT
+    neighbourPos = pos;
+    neighbourPos.z -= 1;
+    it = m_chunks.find(neighbourPos);
+    if (it != m_chunks.end()) {
+        temp = (*it).second;
+        chunk->neighbours.front = temp;
+        temp->neighbours.back = chunk;
+    } else {
+        chunk->neighbours.front = nullptr;
+    }
+
+    // BACK
+    neighbourPos = pos;
+    neighbourPos.z += 1;
+    it = m_chunks.find(neighbourPos);
+    if (it != m_chunks.end()) {
+        temp = (*it).second;
+        chunk->neighbours.back = temp;
+        temp->neighbours.front = chunk;
+    } else {
+        chunk->neighbours.back = nullptr;
+    }
 }

@@ -12,7 +12,7 @@ namespace hemlock {
             using Chunks    = std::unordered_map<ChunkID, Chunk*>;
         public:
             ChunkGrid() :
-                m_size(0), m_generator(nullptr), m_mesher(nullptr), m_genTasks(GenTasks()), m_meshTasks(MeshTasks())
+                m_size(0), m_generator(nullptr), m_mesher(nullptr)
             { /* Empty */ }
 
 			void init(ui16 size, IChunkGenerator* generator, ChunkMesher* mesher);
@@ -25,10 +25,13 @@ namespace hemlock {
 			void handleBlockChange(Sender sender, BlockChangeEvent event);
 			void handleBulkBlockChange(Sender sender, BulkBlockChangeEvent event);
         private:
-			ui16 m_size = 0;
+            Chunk* createChunk(ChunkRectilinearWorldPosition pos);
+            void establishChunkNeighbours(Chunk* chunk, ChunkRectilinearWorldPosition pos);
 
-            IChunkGenerator* m_generator = nullptr;
-			ChunkMesher*	 m_mesher = nullptr;
+			ui16 m_size;
+
+            IChunkGenerator* m_generator;
+			ChunkMesher*	 m_mesher;
 
             GenTasks  m_genTasks;
 			MeshTasks m_meshTasks;

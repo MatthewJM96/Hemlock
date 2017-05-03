@@ -29,7 +29,7 @@ namespace hemlock {
 
         class Chunk {
 		public:
-			void init(ui16 size);
+			void init(ui16 size, ChunkRectilinearWorldPosition chunkPosition);
 			void dispose();
 			
 			// TODO(Matthew): Schedule chunk meshing task when blocks are set.

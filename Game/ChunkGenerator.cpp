@@ -40,15 +40,14 @@ void ChunkGenerator::runGenTask(hvox::ChunkGenTask task, ui16 size) {
     bigDetails.bound = { 0.0, 200.0 };
     bigDetails.clamp = { 0.0,  0.0 };
 
-    for (ui32 x = 0; x < size; ++x) {
-        for (ui32 z = 0; z < size; ++z) {
+    for (i64 x = 0; x < size; ++x) {
+        for (i64 z = 0; z < size; ++z) {
 			glm::f64vec2 pos = { task.pos.x + x, task.pos.z + z };
             i64 y = (i64)glm::floor(hproc::Noise::getNoiseValue(pos, smallDetails) + hproc::Noise::getNoiseValue(pos, medDetails) + hproc::Noise::getNoiseValue(pos, bigDetails));
-            y -= task.pos.z;
+            y -= task.pos.y;
             if (y < 0) continue;
-            if (y > size) y = size;
-            for (i64 zP = 0; zP < z; ++zP) {
-                hvox::BlockChunkPosition blockPos = { (ui16)x, (ui16)y, (ui16)zP };
+            for (i64 yP = 0; yP < z; ++yP) {
+                hvox::BlockChunkPosition blockPos = { (ui16)x, (ui16)yP, (ui16)z };
                 chunk->setBlock(blockPos, { true });
             }
         }
