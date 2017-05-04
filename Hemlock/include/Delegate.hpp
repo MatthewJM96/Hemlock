@@ -98,6 +98,8 @@ namespace hemlock {
             this->m_function = delegate.m_function;
             this->m_executor = delegate.m_executor;
             this->m_deletor  = delegate.m_deletor;
+            delegate.m_deletor = nullptr;
+            delegate.m_object  = nullptr;
             return *this;
         }
 
@@ -132,8 +134,8 @@ namespace hemlock {
             return Delegate(object, (GenericMemberFunction)function, &executeWithObject<SpecificClass>);
         }
         template<typename SpecificClass, typename = typename std::enable_if<std::is_class<SpecificClass>::value>::type>
-        static Delegate createCopy(SpecificClass* object, MemberFunction<SpecificClass> function) {
-            return Delegate(new SpecificClass(*object), (GenericMemberFunction)function, &executeWithObject<SpecificClass>, &destroy<SpecificClass>);
+        static Delegate createCopy(SpecificClass& object, MemberFunction<SpecificClass> function) {
+            return Delegate(new SpecificClass(object), (GenericMemberFunction)function, &executeWithObject<SpecificClass>, &destroy<SpecificClass>);
         }
         // Const member functions.
         template<typename SpecificClass, typename = typename std::enable_if<std::is_class<SpecificClass>::value>::type>
@@ -141,8 +143,8 @@ namespace hemlock {
             return Delegate(object, (GenericMemberFunction)function, &executeWithObject<SpecificClass>);
         }
         template<typename SpecificClass, typename = typename std::enable_if<std::is_class<SpecificClass>::value>::type>
-        static Delegate createCopy(SpecificClass const* object, ConstMemberFunction<SpecificClass> function) {
-            return Delegate(new SpecificClass(*const_cast<SpecificClass*>(object)), (GenericMemberFunction)function, &executeWithObject<SpecificClass>, &destroy<SpecificClass>);
+        static Delegate createCopy(SpecificClass const& object, ConstMemberFunction<SpecificClass> function) {
+            return Delegate(new SpecificClass(const_cast<SpecificClass>(object)), (GenericMemberFunction)function, &executeWithObject<SpecificClass>, &destroy<SpecificClass>);
         }
     protected:
         // Execution routine for static functions.
@@ -190,13 +192,13 @@ namespace hemlock {
     /// Enable make functions only if SpecificClass is a class.
     // Non-const member functions.
     template<typename SpecificClass, typename ReturnType, typename ...Parameters, typename = typename std::enable_if<std::is_class<SpecificClass>::value>::type>
-    Delegate<ReturnType, Parameters...> makeDelegate(SpecificClass& object, ReturnType(SpecificClass::*function)(Parameters...)) {
-        return Delegate<ReturnType, Parameters...>::template create<SpecificClass>(&object, function);
+    Delegate<ReturnType, Parameters...> makeDelegate(SpecificClass* object, ReturnType(SpecificClass::*function)(Parameters...)) {
+        return Delegate<ReturnType, Parameters...>::template create<SpecificClass>(object, function);
     }
     // Const member functions.
     template<typename SpecificClass, typename ReturnType, typename ...Parameters, typename = typename std::enable_if<std::is_class<SpecificClass>::value>::type>
-    Delegate<ReturnType, Parameters...> makeDelegate(SpecificClass const& object, ReturnType(SpecificClass::*function)(Parameters...) const) {
-        return Delegate<ReturnType, Parameters...>::template create<SpecificClass>(&object, function);
+    Delegate<ReturnType, Parameters...> makeDelegate(SpecificClass const* object, ReturnType(SpecificClass::*function)(Parameters...) const) {
+        return Delegate<ReturnType, Parameters...>::template create<SpecificClass>(object, function);
     }
     // // Invokable classes.
     // template<typename SpecificClass, typename ReturnType, typename ...Parameters, typename = typename std::enable_if<std::is_class<SpecificClass>::value>::type>
@@ -210,12 +212,12 @@ namespace hemlock {
     // Non-const member functions.
     template<typename SpecificClass, typename ReturnType, typename ...Parameters, typename = typename std::enable_if<std::is_class<SpecificClass>::value>::type>
     Delegate<ReturnType, Parameters...> makeFunctor(SpecificClass& object, ReturnType(SpecificClass::*function)(Parameters...)) {
-        return Delegate<ReturnType, Parameters...>::template createCopy<SpecificClass>(&object, function);
+        return Delegate<ReturnType, Parameters...>::template createCopy<SpecificClass>(object, function);
     }
     // Const member functions.
     template<typename SpecificClass, typename ReturnType, typename ...Parameters, typename = typename std::enable_if<std::is_class<SpecificClass>::value>::type>
     Delegate<ReturnType, Parameters...> makeFunctor(SpecificClass const& object, ReturnType(SpecificClass::*function)(Parameters...) const) {
-        return Delegate<ReturnType, Parameters...>::template createCopy<SpecificClass>(&object, function);
+        return Delegate<ReturnType, Parameters...>::template createCopy<SpecificClass>(object, function);
     }
 }
 namespace h = hemlock;
