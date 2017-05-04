@@ -3,60 +3,59 @@
 #include "voxel/ChunkGrid.h"
 
 void hvox::ChunkGrid::init(ui16 size, IChunkGenerator* generator, ChunkMesher* mesher) {
-	m_size      = size;
-	m_generator = generator;
-	m_mesher    = mesher;
+    m_size      = size;
+    m_generator = generator;
+    m_mesher    = mesher;
 }
 
 void hvox::ChunkGrid::dispose() {
-	// Note generator and mesher should only be deleted by initialising code.
-	m_generator = nullptr;
-	m_mesher    = nullptr;
+    // Note generator and mesher should only be deleted by initialising code.
+    m_generator = nullptr;
+    m_mesher    = nullptr;
 
     GenTasks().swap(m_genTasks);
-	MeshTasks().swap(m_meshTasks);
-	Chunks().swap(m_chunks);
+    MeshTasks().swap(m_meshTasks);
+    Chunks().swap(m_chunks);
 }
 
 void hvox::ChunkGrid::submitGenTask(ChunkLOD lod, ChunkGenType type, ChunkRectilinearWorldPosition pos) {
-	auto it = m_chunks.find(pos);
-	Chunk* chunk = nullptr;
-	if (it == m_chunks.end()) {
+    auto it = m_chunks.find(pos);
+    Chunk* chunk = nullptr;
+    if (it == m_chunks.end()) {
         chunk = createChunk(pos);
-	} else {
-		chunk = (*it).second;
-	}
-
-	m_genTasks.push({ lod, type, chunk, { pos } });
+    } else {
+        chunk = (*it).second;
+    }
+    m_genTasks.push({ lod, type, chunk,{ pos } });
 }
 
 void hvox::ChunkGrid::update() {
-	while (!m_genTasks.empty()) {
-		m_generator->runGenTask(m_genTasks.front(), m_size);
-		m_genTasks.pop();
-	}
-	while (!m_meshTasks.empty()) {
-		m_mesher->runMeshTask(m_meshTasks.front(), m_size);
-		m_meshTasks.pop();
-	}
+    while (!m_genTasks.empty()) {
+        m_generator->runGenTask(m_genTasks.front(), m_size);
+        m_genTasks.pop();
+    }
+    while (!m_meshTasks.empty()) {
+        m_mesher->runMeshTask(m_meshTasks.front(), m_size);
+        m_meshTasks.pop();
+    }
 }
 
 void hvox::ChunkGrid::handleBlockChange(h::Sender sender, BlockChangeEvent event) {
     // TODO(Matthew): We really shouldn't be submitting a mesh task for each block change...
     //                We want one mesh task per chunk on the queue at any given time AT MOST regardless of number of blocks changed.
-	m_meshTasks.push(ChunkMeshTask{
-		{ event.chunkPos },
-		(Chunk*)sender
-	});
+    m_meshTasks.push(ChunkMeshTask{
+        { event.chunkPos },
+        (Chunk*)sender
+    });
 }
 
 void hvox::ChunkGrid::handleBulkBlockChange(h::Sender sender, BulkBlockChangeEvent event) {
     // TODO(Matthew): We really shouldn't be submitting a mesh task for each block change...
     //                We want one mesh task per chunk on the queue at any given time AT MOST regardless of number of blocks changed.
-	m_meshTasks.push(ChunkMeshTask{
-	 	{ event.chunkPos },
-		(Chunk*)sender
-	});
+    m_meshTasks.push(ChunkMeshTask{
+        { event.chunkPos },
+        (Chunk*)sender
+    });
 }
 
 hvox::Chunk* hvox::ChunkGrid::createChunk(ChunkRectilinearWorldPosition pos) {
