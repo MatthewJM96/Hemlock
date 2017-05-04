@@ -6,7 +6,7 @@
 #include <glm/gtc/quaternion.hpp>
 
 void hcam::BasicCamera::attachToWindow(hg::Window* window) {
-    window->onWindowResize += makeDelegate(*this, &hcam::BasicCamera::handleWindowResize);
+    window->onWindowResize += makeDelegate(this, &hcam::BasicCamera::handleWindowResize);
 }
 
 void hcam::BasicCamera::update() {
