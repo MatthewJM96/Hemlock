@@ -12,12 +12,12 @@ namespace hemlock {
             STREAM  = GL_STREAM_DRAW
         };
 
-        template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+        template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
         struct Vertex3D {
             FXX x, y, z, r, g, b, a, u, v;
         };
 
-        template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+        template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
         struct MeshData3D {
             Vertex3D<FXX>* vertices;
             ui32           vertexCount;
@@ -27,7 +27,7 @@ namespace hemlock {
 
         // TODO(Matthew): Figure out if certain bits (looking at glEnableVertexAttribArray) can't be so-generalised.
         // TODO(Matthew): Make class so we can properly dispose of VBO and EBO.
-        template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+        template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
         inline GLuint createVAO(MeshData3D<FXX> vertexData, VertexDataVolatility volatility = VertexDataVolatility::STATIC) {
             if (!vertexData.vertices) return 0;
 

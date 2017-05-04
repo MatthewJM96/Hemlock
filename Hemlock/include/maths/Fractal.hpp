@@ -16,27 +16,27 @@ namespace hemlock {
             //
             // Ported to C++ by Matthew Marshall
 
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline glm::tvec3<FXX, glm::highp> mod289(glm::tvec3<FXX, glm::highp> x) {
                 return x - glm::floor(x * (FXX)(1.0 / 289.0)) * (FXX)289.0;
             }
 
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline glm::tvec2<FXX, glm::highp> mod289(glm::tvec2<FXX, glm::highp> x) {
                 return x - glm::floor(x * (FXX)(1.0 / 289.0)) * (FXX)289.0;
             }
 
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline glm::tvec3<FXX, glm::highp> mod7(glm::tvec3<FXX, glm::highp> x) {
                 return x - glm::floor(x * (FXX)(1.0 / 7.0)) * (FXX)7.0;
             }
 
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline glm::tvec3<FXX, glm::highp> permute(glm::tvec3<FXX, glm::highp> x) {
                 return mod289(((FXX)34.0 * x + (FXX)1.0) * x);
             }
 
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             glm::tvec2<FXX, glm::highp> genCellular(glm::tvec2<FXX, glm::highp> coords) {
                 using FXXv2 = glm::tvec2<FXX, glm::highp>;
                 using FXXv3 = glm::tvec3<FXX, glm::highp>;
@@ -92,7 +92,7 @@ namespace hemlock {
 #undef Ko
 #undef jitter
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             glm::tvec2<FXX, glm::highp> genCellular(glm::tvec3<FXX, glm::highp> coords) {
                 using FXXv2 = glm::tvec2<FXX, glm::highp>;
                 using FXXv3 = glm::tvec3<FXX, glm::highp>;
@@ -335,18 +335,18 @@ namespace hemlock {
                 { 2,1,0,3 },{ 0,0,0,0 },{ 0,0,0,0 },{ 0,0,0,0 },{ 3,1,0,2 },{ 0,0,0,0 },{ 3,2,0,1 },{ 3,2,1,0 }
             };
 
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline int fastfloor(const FXX x) { return x > 0 ? (int)x : (int)x - 1; }
 
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX dot(const int* g, const FXX x, const FXX y) { return g[0] * x + g[1] * y; }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX dot(const int* g, const FXX x, const FXX y, const FXX z) { return g[0] * x + g[1] * y + g[2] * z; }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static  FXX dot(const int* g, const FXX x, const FXX y, const FXX z, const FXX w) { return g[0] * x + g[1] * y + g[2] * z + g[3] * w; }
 
 
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             FXX genSimplex(glm::tvec2<FXX, glm::highp> coords) {
                 // Noise contributions from the three corners
                 FXX n0, n1, n2;
@@ -422,7 +422,7 @@ namespace hemlock {
                 // The result is scaled to return values in the interval [-1,1].
                 return (FXX)70.0 * (n0 + n1 + n2);
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             FXX genSimplex(glm::tvec3<FXX, glm::highp> coords) {
                 FXX n0, n1, n2, n3; // Noise contributions from the four corners
 
@@ -555,7 +555,7 @@ namespace hemlock {
                 // The result is scaled to stay just inside [-1,1]
                 return 32.0*(n0 + n1 + n2 + n3);
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             FXX genSimplex(glm::tvec4<FXX, glm::highp> coords) {
                 // The skewing and unskewing factors are hairy again for the 4D case
                 FXX F4 = (glm::sqrt(5.0) - (FXX)1.0) / (FXX)4.0;
@@ -693,21 +693,21 @@ namespace hemlock {
                 return 27.0 * (n0 + n1 + n2 + n3 + n4);
             }
 
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             FXX genSimplexScaled(FXX loBound, FXX hiBound, glm::tvec2<FXX, glm::highp> coords) {
                 return genSimplex(coords) * (hiBound - loBound) / (FXX)2.0 + (hiBound + loBound) / (FXX)2.0;
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             FXX genSimplexScaled(FXX loBound, FXX hiBound, glm::tvec3<FXX, glm::highp> coords) {
                 return genSimplex(coords) * (hiBound - loBound) / (FXX)2.0 + (hiBound + loBound) / (FXX)2.0;
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             FXX genSimplexScaled(FXX loBound, FXX hiBound, glm::tvec4<FXX, glm::highp> coords) {
                 return genSimplex(coords) * (hiBound - loBound) / (FXX)2.0 + (hiBound + loBound) / (FXX)2.0;
             }
 
             // Could probably reduce code repetitiveness if we used templates even more clever-like...
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             FXX genSimplexWithOctaves(ui8 octaves, FXX persistence, FXX scale, glm::tvec2<FXX, glm::highp> coords) {
                 FXX total = (FXX)0.0;
                 FXX frequency = scale;
@@ -727,7 +727,7 @@ namespace hemlock {
 
                 return total / maxAmplitude;
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             FXX genSimplexWithOctaves(ui8 octaves, FXX persistence, FXX scale, glm::tvec3<FXX, glm::highp> coords) {
                 FXX total = (FXX)0.0;
                 FXX frequency = scale;
@@ -747,7 +747,7 @@ namespace hemlock {
 
                 return total / maxAmplitude;
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             FXX genSimplexWithOctaves(ui8 octaves, FXX persistence, FXX scale, glm::tvec4<FXX, glm::highp> coords) {
                 FXX total = (FXX)0.0;
                 FXX frequency = scale;
@@ -768,15 +768,15 @@ namespace hemlock {
                 return total / maxAmplitude;
             }
 
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             FXX genSimplexWithOctavesScaled(ui8 octaves, FXX persistence, FXX scale, FXX loBound, FXX hiBound, glm::tvec2<FXX, glm::highp> coords) {
                 return genSimplexWithOctaves(octaves, persistence, scale, coords) * (hiBound - loBound) / (FXX)2.0 + (hiBound + loBound) / (FXX)2.0;
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             FXX genSimplexWithOctavesScaled(ui8 octaves, FXX persistence, FXX scale, FXX loBound, FXX hiBound, glm::tvec3<FXX, glm::highp> coords) {
                 return genSimplexWithOctaves(octaves, persistence, scale, coords) * (hiBound - loBound) / (FXX)2.0 + (hiBound + loBound) / (FXX)2.0;
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             FXX genSimplexWithOctavesScaled(ui8 octaves, FXX persistence, FXX scale, FXX loBound, FXX hiBound, glm::tvec4<FXX, glm::highp> coords) {
                 return genSimplexWithOctaves(octaves, persistence, scale, coords) * (hiBound - loBound) / (FXX)2.0 + (hiBound + loBound) / (FXX)2.0;
             }

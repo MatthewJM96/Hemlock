@@ -31,16 +31,16 @@ namespace hemlock {
                 QUINTIC
             };
 
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             struct Bound {
                 FXX hi, lo;
             };
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             struct Clamp {
                 FXX hi, lo;
             };
 
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             struct NoiseData {
                 Type                        type;        // The type of noise to use.
                 Multiplier                  multiplier;  // Whether (and to what extent) to exponentiate the noise value.
@@ -53,7 +53,7 @@ namespace hemlock {
                 FXX                         modifier;    // Modifies the noise value (before all else including multiplier) using the same operation as specified for the noise itself.
             };
 
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             NoiseData<FXX> getDefaultNoiseData() {
                 return {
                     Type::NONE,
@@ -68,7 +68,7 @@ namespace hemlock {
                 };
             }
 
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX doOp(Operation op, FXX a, FXX b) {
                 switch (op) {
                     case Operation::ADD:
@@ -84,20 +84,20 @@ namespace hemlock {
                 }
             }
 
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX getRawNoiseValue(glm::tvec2<FXX, glm::highp> coords, NoiseData<FXX> data) {
                 return hm::Fractal::genSimplexWithOctaves(data.octaves, data.persistence, data.frequency, coords);
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX getRawNoiseValue(glm::tvec3<FXX, glm::highp> coords, NoiseData<FXX> data) {
                 return hm::Fractal::genSimplexWithOctaves(data.octaves, data.persistence, data.frequency, coords);
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX getRawNoiseValue(glm::tvec4<FXX, glm::highp> coords, NoiseData<FXX> data) {
                 return hm::Fractal::genSimplexWithOctaves(data.octaves, data.persistence, data.frequency, coords);
             }
 
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX getRidgedNoiseValue(glm::tvec2<FXX, glm::highp> coords, NoiseData<FXX> data) {
                 FXX total = (FXX)0.0;
                 FXX frequency = data.frequency;
@@ -117,7 +117,7 @@ namespace hemlock {
 
                 return total / maxAmplitude;
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX getRidgedNoiseValue(glm::tvec3<FXX, glm::highp> coords, NoiseData<FXX> data) {
                 FXX total = (FXX)0.0;
                 FXX frequency = data.frequency;
@@ -137,7 +137,7 @@ namespace hemlock {
 
                 return total / maxAmplitude;
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX getRidgedNoiseValue(glm::tvec4<FXX, glm::highp> coords, NoiseData<FXX> data) {
                 FXX total = (FXX)0.0;
                 FXX frequency = data.frequency;
@@ -158,7 +158,7 @@ namespace hemlock {
                 return total / maxAmplitude;
             }
 
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX getBillowNoiseValue(glm::tvec2<FXX, glm::highp> coords, NoiseData<FXX> data) {
                 FXX total = (FXX)0.0;
                 FXX frequency = data.frequency;
@@ -178,7 +178,7 @@ namespace hemlock {
 
                 return total / maxAmplitude;
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX getBillowNoiseValue(glm::tvec3<FXX, glm::highp> coords, NoiseData<FXX> data) {
                 FXX total = (FXX)0.0;
                 FXX frequency = data.frequency;
@@ -198,7 +198,7 @@ namespace hemlock {
 
                 return total / maxAmplitude;
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX getBillowNoiseValue(glm::tvec4<FXX, glm::highp> coords, NoiseData<FXX> data) {
                 FXX total = (FXX)0.0;
                 FXX frequency = data.frequency;
@@ -219,7 +219,7 @@ namespace hemlock {
                 return total / maxAmplitude;
             }
 
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX getAbsNoiseValue(glm::tvec2<FXX, glm::highp> coords, NoiseData<FXX> data) {
                 FXX total = (FXX)0.0;
                 FXX frequency = data.frequency;
@@ -239,7 +239,7 @@ namespace hemlock {
 
                 return total / maxAmplitude;
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX getAbsNoiseValue(glm::tvec3<FXX, glm::highp> coords, NoiseData<FXX> data) {
                 FXX total = (FXX)0.0;
                 FXX frequency = data.frequency;
@@ -259,7 +259,7 @@ namespace hemlock {
 
                 return total / maxAmplitude;
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX getAbsNoiseValue(glm::tvec4<FXX, glm::highp> coords, NoiseData<FXX> data) {
                 FXX total = (FXX)0.0;
                 FXX frequency = data.frequency;
@@ -280,7 +280,7 @@ namespace hemlock {
                 return total / maxAmplitude;
             }
 
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX getCellularNoiseValue(glm::tvec2<FXX, glm::highp> coords, NoiseData<FXX> data) {
                 FXX total = (FXX)0.0;
                 FXX frequency = data.frequency;
@@ -301,7 +301,7 @@ namespace hemlock {
 
                 return total / maxAmplitude;
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX getCellularNoiseValue(glm::tvec3<FXX, glm::highp> coords, NoiseData<FXX> data) {
                 FXX total = (FXX)0.0;
                 FXX frequency = data.frequency;
@@ -321,7 +321,7 @@ namespace hemlock {
 
                 return total / maxAmplitude;
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX getCellularNoiseValue(glm::tvec4<FXX, glm::highp> coords, NoiseData<FXX> data) {
                 FXX total = (FXX)0.0;
                 FXX frequency = data.frequency;
@@ -342,7 +342,7 @@ namespace hemlock {
                 return total / maxAmplitude;
             }
 
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX getCellularSquaredNoiseValue(glm::tvec2<FXX, glm::highp> coords, NoiseData<FXX> data) {
                 FXX total = (FXX)0.0;
                 FXX frequency = data.frequency;
@@ -364,7 +364,7 @@ namespace hemlock {
 
                 return total / maxAmplitude;
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX getCellularSquaredNoiseValue(glm::tvec3<FXX, glm::highp> coords, NoiseData<FXX> data) {
                 FXX total = (FXX)0.0;
                 FXX frequency = data.frequency;
@@ -386,7 +386,7 @@ namespace hemlock {
 
                 return total / maxAmplitude;
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX getCellularSquaredNoiseValue(glm::tvec4<FXX, glm::highp> coords, NoiseData<FXX> data) {
                 FXX total = (FXX)0.0;
                 FXX frequency = data.frequency;
@@ -409,7 +409,7 @@ namespace hemlock {
                 return total / maxAmplitude;
             }
 
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX getCellularCubicNoiseValue(glm::tvec2<FXX, glm::highp> coords, NoiseData<FXX> data) {
                 FXX total = (FXX)0.0;
                 FXX frequency = data.frequency;
@@ -431,7 +431,7 @@ namespace hemlock {
 
                 return total / maxAmplitude;
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX getCellularCubicNoiseValue(glm::tvec3<FXX, glm::highp> coords, NoiseData<FXX> data) {
                 FXX total = (FXX)0.0;
                 FXX frequency = data.frequency;
@@ -453,7 +453,7 @@ namespace hemlock {
 
                 return total / maxAmplitude;
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             static inline FXX getCellularCubicNoiseValue(glm::tvec4<FXX, glm::highp> coords, NoiseData<FXX> data) {
                 FXX total = (FXX)0.0;
                 FXX frequency = data.frequency;
@@ -476,7 +476,7 @@ namespace hemlock {
                 return total / maxAmplitude;
             }
 
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             FXX getNoiseValue(glm::tvec2<FXX, glm::highp> coords, NoiseData<FXX> data, const FXX* start = nullptr) {
                 FXX res;
 
@@ -546,7 +546,7 @@ namespace hemlock {
 
                 return res;
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             FXX getNoiseValue(glm::tvec3<FXX, glm::highp> coords, NoiseData<FXX> data, const FXX* start = nullptr) {
                 FXX res;
 
@@ -610,7 +610,7 @@ namespace hemlock {
 
                 return res;
             }
-            template<typename FXX, typename = std::enable_if_t<std::is_floating_point<FXX>::value>>
+            template<typename FXX, typename = typename std::enable_if<std::is_floating_point<FXX>::value>::type>
             FXX getNoiseValue(glm::tvec4<FXX, glm::highp> coords, NoiseData<FXX> data, const FXX* start = nullptr) {
                 FXX res;
 
