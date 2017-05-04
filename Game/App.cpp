@@ -9,7 +9,7 @@ void App::init() {
     if (m_initialised) return;
     IApp::init();
     
-    hui::InputDispatcher::getInstance()->onKeyboardButtonUp += { 1, h::makeDelegate(*this, &App::handleKeyboardButtonDown) };
+    hui::InputDispatcher::getInstance()->onKeyboardButtonUp += { 1, h::makeDelegate(this, &App::handleKeyboardButtonDown) };
 }
 
 void App::prepareScreens() {

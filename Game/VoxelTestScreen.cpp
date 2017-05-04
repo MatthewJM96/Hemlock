@@ -15,8 +15,8 @@ void VoxelTestScreen::init(const char* name) {
     m_camera.setFov(45.0f);
     m_camera.update();
 
-    hui::InputDispatcher::getInstance()->onMouseMove += { 2, h::makeDelegate(*this, &VoxelTestScreen::handleMouseMovement) };
-    hui::InputDispatcher::getInstance()->onKeyboardButtonDown += { 2, h::makeDelegate(*this, &VoxelTestScreen::handleMouseCapture) };
+    hui::InputDispatcher::getInstance()->onMouseMove          += { 2, h::makeDelegate(this, &VoxelTestScreen::handleMouseMovement) };
+    hui::InputDispatcher::getInstance()->onKeyboardButtonDown += { 2, h::makeDelegate(this, &VoxelTestScreen::handleMouseCapture) };
 
     m_shader.init();
     m_shader.addShaders("shaders/simple.frag", "shaders/simple.vert");
@@ -26,7 +26,6 @@ void VoxelTestScreen::init(const char* name) {
     m_texture2 = hg::Texture::load("textures/anfo.png", true);
     
     m_chunkGrid.init(CHUNK_SIZE, new ChunkGenerator(), new hvox::ChunkMesher());
-
     for (i32 x = -VIEW_DIST; x < VIEW_DIST; ++x) {
         for (i32 y = -VIEW_DIST; y < VIEW_DIST; ++y) {
             for (i32 z = -VIEW_DIST; z < VIEW_DIST; ++z) {

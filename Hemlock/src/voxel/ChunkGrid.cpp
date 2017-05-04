@@ -43,8 +43,8 @@ void hvox::ChunkGrid::update() {
 
 void hvox::ChunkGrid::handleBlockChange(h::Sender sender, BlockChangeEvent event) {
     // TODO(Matthew): We really shouldn't be submitting a mesh task for each block change...
-    //                We want one mesh task per chunk per frame AT MOST regardless of number of blocks changed.
-	m_meshTasks.push({
+    //                We want one mesh task per chunk on the queue at any given time AT MOST regardless of number of blocks changed.
+	m_meshTasks.push(ChunkMeshTask{
 		{ event.chunkPos },
 		(Chunk*)sender
 	});
@@ -52,8 +52,8 @@ void hvox::ChunkGrid::handleBlockChange(h::Sender sender, BlockChangeEvent event
 
 void hvox::ChunkGrid::handleBulkBlockChange(h::Sender sender, BulkBlockChangeEvent event) {
     // TODO(Matthew): We really shouldn't be submitting a mesh task for each block change...
-    //                We want one mesh task per chunk per frame AT MOST regardless of number of blocks changed.
-	m_meshTasks.push({
+    //                We want one mesh task per chunk on the queue at any given time AT MOST regardless of number of blocks changed.
+	m_meshTasks.push(ChunkMeshTask{
 	 	{ event.chunkPos },
 		(Chunk*)sender
 	});
@@ -64,8 +64,8 @@ hvox::Chunk* hvox::ChunkGrid::createChunk(ChunkRectilinearWorldPosition pos) {
     chunk->init(m_size, pos);
     m_chunks[pos] = chunk;
 
-    chunk->onBlockChange += makeDelegate(*this, &ChunkGrid::handleBlockChange);
-    chunk->onBulkBlockChange += makeDelegate(*this, &ChunkGrid::handleBulkBlockChange);
+    chunk->onBlockChange     += makeDelegate(this, &ChunkGrid::handleBlockChange);
+    chunk->onBulkBlockChange += makeDelegate(this, &ChunkGrid::handleBulkBlockChange);
 
     establishChunkNeighbours(chunk, pos);
 
