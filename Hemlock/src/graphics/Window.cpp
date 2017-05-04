@@ -76,7 +76,7 @@ void hg::Window::windowDimensionsHaveChanged(ui32 width, ui32 height) {
 
     WindowDimensions temp = m_settings.dimensions;
     m_settings.dimensions = { width, height };
-    onWindowResize({ temp, m_settings.dimensions });
+    onWindowResize(ResizeEvent{ temp, m_settings.dimensions });
 }
 
 void hg::Window::getAllowedDisplayResolutions() {
