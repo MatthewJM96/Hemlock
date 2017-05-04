@@ -24,6 +24,8 @@ bld/
 *.o
 *.exe
 Hemlock/*.a
+deps/lib/libHemlock.a
+Game/Game
 
 # Visual Studio 2015 cache/options directory
 .vs/
