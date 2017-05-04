@@ -27,7 +27,7 @@ namespace hemlock {
             i32 x, y, z;
         };
         // Chunk position in rectilinear world-space.
-        struct ChunkRectilinearWorldPosition {
+        union ChunkRectilinearWorldPosition {
             struct {
                 i64 x : 24;
                 i64 y : 16;
