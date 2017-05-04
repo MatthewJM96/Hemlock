@@ -91,7 +91,7 @@ namespace hemlock {
             RPriorityEvent<bool>                 onQuit;
         private:
             InputDispatcher() :
-                m_window(nullptr) {};
+                m_initialised(false), m_window(nullptr), m_manager(nullptr) {};
 
             static InputDispatcher* m_instance;
 
