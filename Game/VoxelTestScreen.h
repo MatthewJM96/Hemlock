@@ -12,7 +12,9 @@
 
 class VoxelTestScreen : public happ::IScreen {
 public:
-    VoxelTestScreen(hui::InputManager* inputManager) : m_inputManager(inputManager) {}
+    VoxelTestScreen(hui::InputManager* inputManager) :
+        m_inputManager(inputManager)
+    { /* EMPTY */ }
 
     void init(const char* name) override;
     void dispose() override;

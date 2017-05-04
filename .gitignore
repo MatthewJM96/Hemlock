@@ -22,6 +22,8 @@ bld/
 [Oo]bj/
 [Ll]og/
 *.o
+*.exe
+Hemlock/*.a
 
 # Visual Studio 2015 cache/options directory
 .vs/
