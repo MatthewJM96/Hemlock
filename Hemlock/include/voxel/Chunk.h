@@ -29,6 +29,11 @@ namespace hemlock {
 
         class Chunk {
 		public:
+            Chunk() :
+                neighbours({ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr }),
+                blocks(nullptr), flags({ false/*, false*/ })
+            { /* EMPTY */ }
+
 			void init(ui16 size, ChunkRectilinearWorldPosition chunkPosition);
 			void dispose();
 			
@@ -51,6 +56,11 @@ namespace hemlock {
 
 			Event<BlockChangeEvent>		onBlockChange	  = Event<BlockChangeEvent>(this);
 			Event<BulkBlockChangeEvent> onBulkBlockChange = Event<BulkBlockChangeEvent>(this);
+
+            struct {
+                //bool hasGenTask  : 1;
+                bool hasMeshTask : 1;
+            } flags;
         private:
 			ChunkRectilinearWorldPosition m_chunkPosition;
 
