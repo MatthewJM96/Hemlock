@@ -25,7 +25,11 @@ void VoxelTestScreen::init(const char* name) {
     m_texture1 = hg::Texture::load("textures/container.jpg", true);
     m_texture2 = hg::Texture::load("textures/anfo.png", true);
     
-    m_chunkGrid.init(CHUNK_SIZE, new ChunkGenerator(), new hvox::ChunkMesher());
+    ChunkGenerator* generator = new ChunkGenerator();
+    hvox::ChunkMesher* mesher = new hvox::ChunkMesher();
+    mesher->init();
+
+    m_chunkGrid.init(CHUNK_SIZE, generator, mesher);
     for (i32 x = -VIEW_DIST; x < VIEW_DIST; ++x) {
         for (i32 y = -VIEW_DIST; y < VIEW_DIST; ++y) {
             for (i32 z = -VIEW_DIST; z < VIEW_DIST; ++z) {
@@ -151,6 +155,18 @@ void VoxelTestScreen::draw(TimeData time) {
     //    }
     //}
     //glBindVertexArray(0);
+
+    glBindVertexArray(0/* What though? */);
+
+    for (i32 i = -VIEW_DIST; i < VIEW_DIST; ++i) {
+        for (i32 j = -VIEW_DIST; j < VIEW_DIST; ++j) {
+            for (i32 k = -VIEW_DIST; k < VIEW_DIST; ++k) {
+                // TODO(Matthew): Move VAOs from ChunkMesher to here-ish, and iterate over quads in each chunk here.
+            }
+        }
+    }
+
+    glBindVertexArray(0);
 
     m_shader.unuse();
 }
