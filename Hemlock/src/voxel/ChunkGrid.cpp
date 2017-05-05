@@ -41,21 +41,29 @@ void hvox::ChunkGrid::update() {
 }
 
 void hvox::ChunkGrid::handleBlockChange(h::Sender sender, BlockChangeEvent event) {
-    // TODO(Matthew): We really shouldn't be submitting a mesh task for each block change...
-    //                We want one mesh task per chunk on the queue at any given time AT MOST regardless of number of blocks changed.
-    m_meshTasks.push(ChunkMeshTask{
-        { event.chunkPos },
-        (Chunk*)sender
-    });
+    Chunk* chunk = (Chunk*)sender;
+
+    // TODO(Matthew): It would be better to not have to go through entire event/delegate system just to reject adding the majority of tasks.
+    if (!chunk->flags.hasMeshTask) {
+        m_meshTasks.push(ChunkMeshTask{
+            { event.chunkPos },
+            chunk
+        });
+        chunk->flags.hasMeshTask = true;
+    }
 }
 
 void hvox::ChunkGrid::handleBulkBlockChange(h::Sender sender, BulkBlockChangeEvent event) {
-    // TODO(Matthew): We really shouldn't be submitting a mesh task for each block change...
-    //                We want one mesh task per chunk on the queue at any given time AT MOST regardless of number of blocks changed.
-    m_meshTasks.push(ChunkMeshTask{
-        { event.chunkPos },
-        (Chunk*)sender
-    });
+    Chunk* chunk = (Chunk*)sender;
+
+    // TODO(Matthew): It would be better to not have to go through entire event/delegate system just to reject adding the majority of tasks.
+    if (!chunk->flags.hasMeshTask) {
+        m_meshTasks.push(ChunkMeshTask{
+            { event.chunkPos },
+            chunk
+        });
+        chunk->flags.hasMeshTask = true;
+    }
 }
 
 hvox::Chunk* hvox::ChunkGrid::createChunk(ChunkRectilinearWorldPosition pos) {
