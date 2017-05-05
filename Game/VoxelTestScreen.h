@@ -34,6 +34,18 @@ private:
 
     hvox::ChunkGrid m_chunkGrid;
 
+    union {
+        GLuint m_quadVAOs[6];
+        struct {
+            GLuint m_frontVAO;
+            GLuint m_backVAO;
+            GLuint m_leftVAO;
+            GLuint m_rightVAO;
+            GLuint m_bottomVAO;
+            GLuint m_topVAO;
+        };
+    };
+
     /*f32* m_heightmap;
     hproc::Noise::NoiseData<f64> m_mapDesc;*/
 

@@ -7,6 +7,57 @@
 
 #include "ChunkGenerator.h"
 
+// Won't need these once greedy merging is in, but for now let's just 
+// figure out simple occlusion. As such don't worry about indexing for now.
+static hg::Vertex3D<f32> FRONT_QUAD[6] = {
+    { -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },
+    { 0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
+    { 0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
+    { 0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
+    { -0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },
+    { -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },
+};
+static hg::Vertex3D<f32> BACK_QUAD[6] = {
+    { -0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },
+    { 0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
+    { 0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
+    { 0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
+    { -0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },
+    { -0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },
+};
+static hg::Vertex3D<f32> LEFT_QUAD[6] = {
+    { -0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
+    { -0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
+    { -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },
+    { -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },
+    { -0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },
+    { -0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
+};
+static hg::Vertex3D<f32> RIGHT_QUAD[6] = {
+    { 0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
+    { 0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
+    { 0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },
+    { 0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },
+    { 0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },
+    { 0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
+};
+static hg::Vertex3D<f32> BOTTOM_QUAD[6] = {
+    { -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },
+    { 0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
+    { 0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
+    { 0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
+    { -0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },
+    { -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },
+};
+static hg::Vertex3D<f32> TOP_QUAD[6] = {
+    { -0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },
+    { 0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
+    { 0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
+    { 0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
+    { -0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },
+    { -0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f }
+};
+
 void VoxelTestScreen::init(const char* name) {
     if (m_initialised) return;
     IScreen::init(name);
@@ -25,11 +76,7 @@ void VoxelTestScreen::init(const char* name) {
     m_texture1 = hg::Texture::load("textures/container.jpg", true);
     m_texture2 = hg::Texture::load("textures/anfo.png", true);
     
-    ChunkGenerator* generator = new ChunkGenerator();
-    hvox::ChunkMesher* mesher = new hvox::ChunkMesher();
-    mesher->init();
-
-    m_chunkGrid.init(CHUNK_SIZE, generator, mesher);
+    m_chunkGrid.init(CHUNK_SIZE, new ChunkGenerator(), new hvox::ChunkMesher());
     for (i32 x = -VIEW_DIST; x < VIEW_DIST; ++x) {
         for (i32 y = -VIEW_DIST; y < VIEW_DIST; ++y) {
             for (i32 z = -VIEW_DIST; z < VIEW_DIST; ++z) {
@@ -39,13 +86,27 @@ void VoxelTestScreen::init(const char* name) {
     }
     m_chunkGrid.update();
 
-    //m_heightmap = new f32[(2 * MAPSIZE + 1) * (2 * MAPSIZE + 1)];
-    //for (i32 x = -MAPSIZE; x <= MAPSIZE; ++x) {
-    //    for (i32 y = -MAPSIZE; y <= MAPSIZE; ++y) {
-    //        m_heightmap[(x + MAPSIZE) + (2 * MAPSIZE + 1) * (y + MAPSIZE)] = getNoise({ x, y }/*, m_mapDesc*/);
-    //        //m_heightmap[(x + 50) + 101 * (y + 50)] = hm::Fractal::genSimplexWithOctavesScaled(m_mapDesc.octaves, m_mapDesc.persistence, m_mapDesc.frequency, m_mapDesc.bound.lo, m_mapDesc.bound.hi, glm::f64vec2(x, y));
-    //    }
-    //}
+    hg::MeshData3D<f32> vData = {};
+    vData.vertexCount = 6;
+    vData.indices = nullptr;
+
+    vData.vertices = FRONT_QUAD;
+    m_frontVAO = hg::createVAO(vData);
+
+    vData.vertices = BACK_QUAD;
+    m_backVAO = hg::createVAO(vData);
+
+    vData.vertices = LEFT_QUAD;
+    m_leftVAO = hg::createVAO(vData);
+
+    vData.vertices = RIGHT_QUAD;
+    m_rightVAO = hg::createVAO(vData);
+
+    vData.vertices = BOTTOM_QUAD;
+    m_bottomVAO = hg::createVAO(vData);
+
+    vData.vertices = TOP_QUAD;
+    m_topVAO = hg::createVAO(vData);
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glEnable(GL_DEPTH_TEST);
@@ -96,16 +157,6 @@ void VoxelTestScreen::update(TimeData time) {
         }
         m_chunkGrid.update();
         m_chunkLoc = pos;
-        //i32 diff = (i32)(m_chunkLoc.x - pos.x);
-        //if (diff < 0) {
-        //    diff = glm::abs(diff);
-        //    for (i32 i = 0; i < diff; ++i) {
-        //        i32 x = i + pos.x - VIEW_DIST;
-        //        m_chunkGrid.submitGenTask(hvox::ChunkLOD::FULL, hvox::ChunkGenType::TERRAIN, { x, y, z });
-        //    }
-        //} else {
-
-        //}
     }
 
     m_camera.update();
@@ -131,42 +182,42 @@ void VoxelTestScreen::draw(TimeData time) {
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, m_texture2);
     glUniform1i(m_shader.getUniformLocation("tex2"), 1);
-
-    //glBindVertexArray(m_voxVAO);
-    //for (i32 i = -VIEW_DIST; i < VIEW_DIST; ++i) {
-    //    for (i32 j = -VIEW_DIST; j < VIEW_DIST; ++j) {
-    //        for (i32 k = -VIEW_DIST; k < VIEW_DIST; ++k) {
-    //            char* hash = new char[256];
-    //            snprintf(hash, 256, "%d|%d|%d", i + (i32)m_chunkLoc.x, j + (i32)m_chunkLoc.y, k + (i32)m_chunkLoc.z);
-    //            hvox::Chunk* chunk = m_chunkGrid.getChunks().at(/*{ i + (i32)m_chunkLoc.x, j + (i32)m_chunkLoc.y, k + (i32)m_chunkLoc.z }*/std::string(hash));
-    //            hvox::Block* blocks = chunk->getBlocks();
-    //            for (ui32 x = 0; x < CHUNK_SIZE; ++x) {
-    //                for (ui32 y = 0; y < CHUNK_SIZE; ++y) {
-    //                    for (ui32 z = 0; z < CHUNK_SIZE; ++z) {
-    //                        if (!blocks[x + y * CHUNK_SIZE + z * CHUNK_SIZE * CHUNK_SIZE].present) continue;
-    //                        glm::f32mat4 model = glm::translate(glm::f32mat4(), glm::f32vec3(x + CHUNK_SIZE * (i + m_chunkLoc.x), y + CHUNK_SIZE * (j + m_chunkLoc.y), z + CHUNK_SIZE * (k + m_chunkLoc.z)));
-    //                        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &model[0][0]);
-
-    //                        glDrawArrays(GL_TRIANGLES, 0, 36);
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
-    //glBindVertexArray(0);
-
-    glBindVertexArray(0/* What though? */);
-
+    
     for (i32 i = -VIEW_DIST; i < VIEW_DIST; ++i) {
         for (i32 j = -VIEW_DIST; j < VIEW_DIST; ++j) {
             for (i32 k = -VIEW_DIST; k < VIEW_DIST; ++k) {
-                // TODO(Matthew): Move VAOs from ChunkMesher to here-ish, and iterate over quads in each chunk here.
+                hvox::ChunkRectilinearWorldPosition pos = { i, j, k };
+                hvox::Chunk* const chunk = m_chunkGrid.getChunks().at(pos);
+
+                for (const hvox::Quad& quad : chunk->mesh.quads) {
+                    switch (quad.face) {
+                    case hvox::Face::TOP:
+                        glBindVertexArray(m_topVAO);
+                        break;
+                    case hvox::Face::BOTTOM:
+                        glBindVertexArray(m_bottomVAO);
+                        break;
+                    case hvox::Face::LEFT:
+                        glBindVertexArray(m_leftVAO);
+                        break;
+                    case hvox::Face::RIGHT:
+                        glBindVertexArray(m_rightVAO);
+                        break;
+                    case hvox::Face::FRONT:
+                        glBindVertexArray(m_frontVAO);
+                        break;
+                    case hvox::Face::BACK:
+                        glBindVertexArray(m_backVAO);
+                        break;
+                    }
+                    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &quad.translationMatrix[0][0]);
+                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                    glBindVertexArray(0);
+                }
             }
         }
     }
 
-    glBindVertexArray(0);
 
     m_shader.unuse();
 }
