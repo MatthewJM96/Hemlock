@@ -75,11 +75,11 @@ void VoxelTestScreen::init(const char* name) {
 
     m_texture1 = hg::Texture::load("textures/container.jpg", true);
     m_texture2 = hg::Texture::load("textures/anfo.png", true);
-    
+
     m_chunkGrid.init(CHUNK_SIZE, new ChunkGenerator(), new hvox::ChunkMesher());
-    for (i32 x = -VIEW_DIST; x < VIEW_DIST; ++x) {
-        for (i32 y = -VIEW_DIST; y < VIEW_DIST; ++y) {
-            for (i32 z = -VIEW_DIST; z < VIEW_DIST; ++z) {
+    for (i32 x = -VIEW_DIST; x <= VIEW_DIST; ++x) {
+        for (i32 y = -VIEW_DIST; y <= VIEW_DIST; ++y) {
+            for (i32 z = -VIEW_DIST; z <= VIEW_DIST; ++z) {
                 m_chunkGrid.submitGenTask(hvox::ChunkLOD::FULL, hvox::ChunkGenType::TERRAIN, { x, y, z });
             }
         }
@@ -183,10 +183,10 @@ void VoxelTestScreen::draw(TimeData time) {
     glBindTexture(GL_TEXTURE_2D, m_texture2);
     glUniform1i(m_shader.getUniformLocation("tex2"), 1);
     
-    for (i32 i = -VIEW_DIST; i < VIEW_DIST; ++i) {
-        for (i32 j = -VIEW_DIST; j < VIEW_DIST; ++j) {
-            for (i32 k = -VIEW_DIST; k < VIEW_DIST; ++k) {
-                hvox::ChunkRectilinearWorldPosition pos = { i, j, k };
+    for (i32 x = -VIEW_DIST; x <= VIEW_DIST; ++x) {
+        for (i32 y = -VIEW_DIST; y <= VIEW_DIST; ++y) {
+            for (i32 z = -VIEW_DIST; z <= VIEW_DIST; ++z) {
+                hvox::ChunkGridPosition pos = { x + m_chunkLoc.x, y + m_chunkLoc.y, z + m_chunkLoc.z };
                 hvox::Chunk* const chunk = m_chunkGrid.getChunks().at(pos);
 
                 for (const hvox::Quad& quad : chunk->mesh.quads) {
