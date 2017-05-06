@@ -17,7 +17,7 @@ void main(){
 	gl_Position = proj * view * model * vec4(position, 1.0f);
 	//gl_Position = vec4(position, 1.0f);
 	
-	vertexColour = vec4(colour);
-	textureCoord = vec2(texCoord.x, texCoord.y);
+	vertexColour = colour;
+	textureCoord = texCoord;
 }
 

@@ -17,11 +17,7 @@ namespace hemlock {
         struct ChunkGenTask {
             ChunkLOD      lod;
             ChunkGenType  type;
-			Chunk*        chunk;
-			union {
-				ChunkID						  id;
-				ChunkRectilinearWorldPosition pos;
-			};
+            Chunk*        chunk;
         };
 
         class IChunkGenerator {
