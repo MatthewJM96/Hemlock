@@ -51,15 +51,24 @@ void ChunkGenerator::runGenTask(hvox::ChunkGenTask task, ui16 size) {
     bigDetails.bound = { -30.0, 250.0 };
     bigDetails.clamp = { 0.0,  0.0 };
 
+    // TODO(Matthew): 3D noise for overhangs etc.
+    // TODO(Matthew): Multi-stage generation for heightmap, ore, water bodies (?), caves, etc.
+
+    hvox::Chunk& chunk = *task.chunk;
+    hvox::BlockRectilinearWorldPosition chunkBlockPos = hvox::getRectilinearWorldPosition(chunk.pos, 0, size);
+    // Iterate over the x-z plane, generating terrain for each point. (Right now just 2D noise).
     for (i64 x = 0; x < size; ++x) {
         for (i64 z = 0; z < size; ++z) {
-			glm::f64vec2 pos = { task.pos.x + x, task.pos.z + z };
-            i64 y = (i64)glm::floor(hproc::Noise::getNoiseValue(pos, smallDetails) + hproc::Noise::getNoiseValue(pos, medDetails) + hproc::Noise::getNoiseValue(pos, bigDetails));
-            y -= task.pos.y;
-            if (y < 0) continue;
-            for (i64 yP = 0; yP < z; ++yP) {
-                hvox::BlockChunkPosition blockPos = { (ui16)x, (ui16)yP, (ui16)z };
-                chunk->setBlock(blockPos, { true });
+            // Get position of column of chunk.
+			glm::f64vec2 pos = { chunkBlockPos.x + x, chunkBlockPos.z + z };
+            // Calculate height of this column, taking off y-position of the base of this chunk to get relative height.
+            i64 yMax = (i64)glm::floor(hproc::Noise::getNoiseValue(pos, smallDetails) + hproc::Noise::getNoiseValue(pos, medDetails) + hproc::Noise::getNoiseValue(pos, medDetails2) + hproc::Noise::getNoiseValue(pos, bigDetails));
+            yMax -= chunkBlockPos.y;
+            // If the relative height is <= 0 then we can just go to the next column - nothing exists in it for this chunk.
+            if (yMax <= 0) continue;
+            // Set each block in this column up-to the relative height generated or the height of the chunk, whichever is smaller.
+            for (i64 y = 0; y < yMax && y < size; ++y) {
+                chunk.setBlock({ (ui16)x, (ui16)y, (ui16)z }, { true });
             }
         }
     }
