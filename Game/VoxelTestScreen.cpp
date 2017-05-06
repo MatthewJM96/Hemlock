@@ -85,26 +85,26 @@ void VoxelTestScreen::init(const char* name) {
         }
     }
     m_chunkGrid.update();
-
+    
     hg::MeshData3D<f32> vData = {};
     vData.vertexCount = 6;
     vData.indices = nullptr;
-
+    
     vData.vertices = FRONT_QUAD;
     m_frontVAO = hg::createVAO(vData);
-
+    
     vData.vertices = BACK_QUAD;
     m_backVAO = hg::createVAO(vData);
-
+    
     vData.vertices = LEFT_QUAD;
     m_leftVAO = hg::createVAO(vData);
-
+    
     vData.vertices = RIGHT_QUAD;
     m_rightVAO = hg::createVAO(vData);
-
+    
     vData.vertices = BOTTOM_QUAD;
     m_bottomVAO = hg::createVAO(vData);
-
+    
     vData.vertices = TOP_QUAD;
     m_topVAO = hg::createVAO(vData);
 
@@ -147,16 +147,49 @@ void VoxelTestScreen::update(TimeData time) {
     glm::f64vec3 pos = glm::f64vec3(m_camera.getPosition());
     pos /= CHUNK_SIZE;
     pos = glm::floor(pos);
-    if (m_chunkLoc.x != pos.x || m_chunkLoc.y != pos.y || m_chunkLoc.z != pos.z) {
-        for (i32 x = -VIEW_DIST; x < VIEW_DIST; ++x) { // lazy but this is all lazy...
-            for (i32 y = -VIEW_DIST; y < VIEW_DIST; ++y) {
-                for (i32 z = -VIEW_DIST; z < VIEW_DIST; ++z) {
-                    m_chunkGrid.submitGenTask(hvox::ChunkLOD::FULL, hvox::ChunkGenType::TERRAIN, { x + (i32)pos.x, y + (i32)pos.y, z + (i32)pos.z });
-                }
+
+    bool runGridUpdate = false;
+
+    f64 xDel = glm::round(pos.x - m_chunkLoc.x);
+    if (xDel != 0.0) {
+        i32 x = xDel * VIEW_DIST;
+        for (i32 y = -VIEW_DIST; y <= VIEW_DIST; ++y) {
+            for (i32 z = -VIEW_DIST; z <= VIEW_DIST; ++z) {
+                m_chunkGrid.submitGenTask(hvox::ChunkLOD::FULL, hvox::ChunkGenType::TERRAIN, { x + (i32)pos.x, y + (i32)pos.y, z + (i32)pos.z });
             }
         }
+        runGridUpdate = true;
+    }
+    f64 yDel = glm::round(pos.y - m_chunkLoc.y);
+    if (yDel != 0.0) {
+        i32 y = yDel * VIEW_DIST;
+        for (i32 x = -VIEW_DIST; x <= VIEW_DIST; ++x) {
+            for (i32 z = -VIEW_DIST; z <= VIEW_DIST; ++z) {
+                m_chunkGrid.submitGenTask(hvox::ChunkLOD::FULL, hvox::ChunkGenType::TERRAIN, { x + (i32)pos.x, y + (i32)pos.y, z + (i32)pos.z });
+            }
+        }
+        runGridUpdate = true;
+    }
+    f64 zDel = glm::round(pos.z - m_chunkLoc.z);
+    if (zDel != 0.0) {
+        i32 z = zDel * VIEW_DIST;
+        for (i32 x = -VIEW_DIST; x <= VIEW_DIST; ++x) {
+            for (i32 y = -VIEW_DIST; y <= VIEW_DIST; ++y) {
+                m_chunkGrid.submitGenTask(hvox::ChunkLOD::FULL, hvox::ChunkGenType::TERRAIN, { x + (i32)pos.x, y + (i32)pos.y, z + (i32)pos.z });
+            }
+        }
+        runGridUpdate = true;
+    }
+
+    if (runGridUpdate) {
         m_chunkGrid.update();
         m_chunkLoc = pos;
+    }
+
+    static size_t _i = 0;
+    if (++_i % 10 == 0) {
+        std::cout << "Pos:  x - " << m_chunkLoc.x << "  --  y - " << m_chunkLoc.y << "  --  z - " << m_chunkLoc.z << std::endl;
+        _i = 0;
     }
 
     m_camera.update();
