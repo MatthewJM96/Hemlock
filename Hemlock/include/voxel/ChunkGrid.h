@@ -18,7 +18,7 @@ namespace hemlock {
             void init(ui16 size, IChunkGenerator* generator, ChunkMesher* mesher);
             void dispose();
 
-            void submitGenTask(ChunkLOD lod, ChunkGenType type, ChunkRectilinearWorldPosition pos);
+            void submitGenTask(ChunkLOD lod, ChunkGenType type, ChunkGridPosition pos);
 
             void update();
 
@@ -27,13 +27,13 @@ namespace hemlock {
 
             const Chunks& getChunks() { return m_chunks; }
         private:
-            Chunk* createChunk(ChunkRectilinearWorldPosition pos);
-            void establishChunkNeighbours(Chunk* chunk, ChunkRectilinearWorldPosition pos);
+            Chunk* createChunk(ChunkGridPosition pos);
+            void establishChunkNeighbours(Chunk* chunk, ChunkGridPosition pos);
 
             ui16 m_size;
 
             IChunkGenerator* m_generator;
-            ChunkMesher*	 m_mesher;
+            ChunkMesher*     m_mesher;
 
             GenTasks  m_genTasks;
             MeshTasks m_meshTasks;
