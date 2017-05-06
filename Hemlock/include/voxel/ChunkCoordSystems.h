@@ -16,18 +16,14 @@ namespace hemlock {
         struct BlockChunkPosition {
             ui16 x, y, z;
         };
-		using QuadPosition = BlockChunkPosition;
+        using QuadPosition = BlockChunkPosition;
         // Block position in rectilinear world-space.
         struct BlockRectilinearWorldPosition {
             i64 x, y, z;
         };
 
         // Chunk position in grid-space.
-        struct ChunkGridPosition {
-            i32 x, y, z;
-        };
-        // Chunk position in rectilinear world-space.
-        union ChunkRectilinearWorldPosition {
+        union ChunkGridPosition {
             struct {
                 i64 x : 24;
                 i64 y : 16;
@@ -35,7 +31,7 @@ namespace hemlock {
             };
             ui64 id;
         };
-        using ChunkID = ChunkRectilinearWorldPosition;
+        using ChunkID = ChunkGridPosition;
 
         bool operator==(const ChunkID& a, const ChunkID& b);
 
@@ -44,7 +40,7 @@ namespace hemlock {
         BlockChunkPosition getBlockChunkPosition(ui64 blockIndex, ui16 size = 32);
 
         BlockRectilinearWorldPosition getRectilinearWorldPosition(ChunkGridPosition chunkPos, BlockChunkPosition blockPos = { 0, 0, 0 }, ui16 size = 32);
-        BlockRectilinearWorldPosition getRectilinearWorldPosition(ChunkGridPosition chunkPos, ui64 blockIndex = 0, ui16 size = 32);
+        BlockRectilinearWorldPosition getRectilinearWorldPosition(ChunkGridPosition chunkPos, ui64 blockIndex, ui16 size = 32);
     }
 }
 namespace hvox = hemlock::voxel;
