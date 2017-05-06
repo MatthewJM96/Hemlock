@@ -62,7 +62,7 @@ void VoxelTestScreen::init(const char* name) {
     if (m_initialised) return;
     IScreen::init(name);
 
-    m_camera.setPosition(glm::f32vec3(0.0f, 0.0f, 20.0f));
+    m_camera.setPosition(glm::f32vec3(0.0f, 0.0f, 0.0f));
     m_camera.setFov(45.0f);
     m_camera.update();
 
