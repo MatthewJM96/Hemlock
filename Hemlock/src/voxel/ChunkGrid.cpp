@@ -18,7 +18,7 @@ void hvox::ChunkGrid::dispose() {
     Chunks().swap(m_chunks);
 }
 
-void hvox::ChunkGrid::submitGenTask(ChunkLOD lod, ChunkGenType type, ChunkRectilinearWorldPosition pos) {
+void hvox::ChunkGrid::submitGenTask(ChunkLOD lod, ChunkGenType type, ChunkGridPosition pos) {
     auto it = m_chunks.find(pos);
     Chunk* chunk = nullptr;
     if (it == m_chunks.end()) {
@@ -26,7 +26,7 @@ void hvox::ChunkGrid::submitGenTask(ChunkLOD lod, ChunkGenType type, ChunkRectil
     } else {
         chunk = (*it).second;
     }
-    m_genTasks.push({ lod, type, chunk,{ pos } });
+    m_genTasks.push({ lod, type, chunk });
 }
 
 void hvox::ChunkGrid::update() {
@@ -46,7 +46,6 @@ void hvox::ChunkGrid::handleBlockChange(h::Sender sender, BlockChangeEvent event
     // TODO(Matthew): It would be better to not have to go through entire event/delegate system just to reject adding the majority of tasks.
     if (!chunk->flags.hasMeshTask) {
         m_meshTasks.push(ChunkMeshTask{
-            { event.chunkPos },
             chunk
         });
         chunk->flags.hasMeshTask = true;
@@ -59,14 +58,13 @@ void hvox::ChunkGrid::handleBulkBlockChange(h::Sender sender, BulkBlockChangeEve
     // TODO(Matthew): It would be better to not have to go through entire event/delegate system just to reject adding the majority of tasks.
     if (!chunk->flags.hasMeshTask) {
         m_meshTasks.push(ChunkMeshTask{
-            { event.chunkPos },
             chunk
         });
         chunk->flags.hasMeshTask = true;
     }
 }
 
-hvox::Chunk* hvox::ChunkGrid::createChunk(ChunkRectilinearWorldPosition pos) {
+hvox::Chunk* hvox::ChunkGrid::createChunk(ChunkGridPosition pos) {
     Chunk* chunk = new Chunk();
     chunk->init(m_size, pos);
     m_chunks[pos] = chunk;
@@ -79,9 +77,9 @@ hvox::Chunk* hvox::ChunkGrid::createChunk(ChunkRectilinearWorldPosition pos) {
     return chunk;
 }
 
-void hvox::ChunkGrid::establishChunkNeighbours(Chunk* chunk, ChunkRectilinearWorldPosition pos) {
+void hvox::ChunkGrid::establishChunkNeighbours(Chunk* chunk, ChunkGridPosition pos) {
     Chunk* temp = nullptr;
-    ChunkRectilinearWorldPosition neighbourPos;
+    ChunkGridPosition neighbourPos;
 
     // Update neighbours with info of new chunk.
     // LEFT
