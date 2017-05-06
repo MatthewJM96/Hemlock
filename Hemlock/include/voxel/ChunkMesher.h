@@ -4,19 +4,15 @@
 #include "graphics/Mesh.hpp"
 
 namespace hemlock {
-	namespace voxel {		
-		struct ChunkMeshTask {
-			union {
-				ChunkID						  id;
-				ChunkRectilinearWorldPosition pos;
-			};
-			Chunk*  chunk;
-		};
+    namespace voxel {        
+        struct ChunkMeshTask {
+            Chunk*  chunk;
+        };
 
-		class ChunkMesher {
-		public:
-			void runMeshTask(ChunkMeshTask task, ui64 size);
-		};
-	}
+        class ChunkMesher {
+        public:
+            void runMeshTask(ChunkMeshTask task, ui64 size);
+        };
+    }
 }
 namespace hvox = hemlock::voxel;
