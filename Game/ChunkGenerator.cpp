@@ -5,10 +5,10 @@
 #include <procedural/Noise.hpp>
 
 void ChunkGenerator::runGenTask(hvox::ChunkGenTask task, ui16 size) {
-    hvox::Chunk* chunk = task.chunk;
 
+    // Set up noise data for small, medium and large-scale terrain details.
     hproc::Noise::NoiseData<f64> smallDetails;
-    smallDetails.type = hproc::Noise::Type::RIDGED;
+    smallDetails.type = hproc::Noise::Type::ABS;
     smallDetails.octaves = 8;
     smallDetails.persistence = 0.85;
     smallDetails.frequency = 0.05;
@@ -19,15 +19,26 @@ void ChunkGenerator::runGenTask(hvox::ChunkGenTask task, ui16 size) {
     smallDetails.clamp = { 0.0,  0.0 };
 
     hproc::Noise::NoiseData<f64> medDetails;
-    medDetails.type = hproc::Noise::Type::RIDGED;
+    medDetails.type = hproc::Noise::Type::CELLULAR_CUBIC;
     medDetails.octaves = 6;
     medDetails.persistence = 0.8;
     medDetails.frequency = 0.0025;
     medDetails.modifier = 1.0;
     medDetails.op = hproc::Noise::Operation::ADD;
     medDetails.multiplier = hproc::Noise::Multiplier::NONE;
-    medDetails.bound = { -50.0, 50.0 };
+    medDetails.bound = { -10.0, 10.0 };
     medDetails.clamp = { 0.0,  0.0 };
+
+    hproc::Noise::NoiseData<f64> medDetails2;
+    medDetails2.type = hproc::Noise::Type::RIDGED;
+    medDetails2.octaves = 6;
+    medDetails2.persistence = 0.8;
+    medDetails2.frequency = 0.0025;
+    medDetails2.modifier = 1.0;
+    medDetails2.op = hproc::Noise::Operation::ADD;
+    medDetails2.multiplier = hproc::Noise::Multiplier::NONE;
+    medDetails2.bound = { -20.0, 10.0 };
+    medDetails2.clamp = { 0.0,  0.0 };
 
     hproc::Noise::NoiseData<f64> bigDetails;
     bigDetails.type = hproc::Noise::Type::RIDGED;
@@ -37,7 +48,7 @@ void ChunkGenerator::runGenTask(hvox::ChunkGenTask task, ui16 size) {
     bigDetails.modifier = 1.0;
     bigDetails.op = hproc::Noise::Operation::ADD;
     bigDetails.multiplier = hproc::Noise::Multiplier::NONE;
-    bigDetails.bound = { 0.0, 200.0 };
+    bigDetails.bound = { -30.0, 250.0 };
     bigDetails.clamp = { 0.0,  0.0 };
 
     for (i64 x = 0; x < size; ++x) {
