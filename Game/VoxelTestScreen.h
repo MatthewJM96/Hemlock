@@ -46,8 +46,5 @@ private:
         };
     };
 
-    /*f32* m_heightmap;
-    hproc::Noise::NoiseData<f64> m_mapDesc;*/
-
     glm::f64vec3 m_chunkLoc = glm::f64vec3(0, 0, 0);
 };
