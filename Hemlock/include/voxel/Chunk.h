@@ -54,6 +54,7 @@ namespace hemlock {
 
             ChunkMesh mesh;
 
+            ChunkGridPosition pos;
 
             Event<BlockChangeEvent>     onBlockChange     = Event<BlockChangeEvent>(this);
             Event<BulkBlockChangeEvent> onBulkBlockChange = Event<BulkBlockChangeEvent>(this);
@@ -63,7 +64,6 @@ namespace hemlock {
                 bool hasMeshTask : 1;
             } flags;
         private:
-			ChunkRectilinearWorldPosition m_chunkPosition;
 
             ui16 m_size;
         };
