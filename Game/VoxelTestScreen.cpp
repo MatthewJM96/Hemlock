@@ -7,57 +7,6 @@
 
 #include "ChunkGenerator.h"
 
-// Won't need these once greedy merging is in, but for now let's just 
-// figure out simple occlusion. As such don't worry about indexing for now.
-static hg::Vertex3D<f32> FRONT_QUAD[6] = {
-    { -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },
-    { 0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
-    { 0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
-    { 0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
-    { -0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },
-    { -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },
-};
-static hg::Vertex3D<f32> BACK_QUAD[6] = {
-    { -0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },
-    { 0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
-    { 0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
-    { 0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
-    { -0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },
-    { -0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },
-};
-static hg::Vertex3D<f32> LEFT_QUAD[6] = {
-    { -0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
-    { -0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
-    { -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },
-    { -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },
-    { -0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },
-    { -0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
-};
-static hg::Vertex3D<f32> RIGHT_QUAD[6] = {
-    { 0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
-    { 0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
-    { 0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },
-    { 0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },
-    { 0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },
-    { 0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
-};
-static hg::Vertex3D<f32> BOTTOM_QUAD[6] = {
-    { -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },
-    { 0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
-    { 0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
-    { 0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
-    { -0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },
-    { -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },
-};
-static hg::Vertex3D<f32> TOP_QUAD[6] = {
-    { -0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f },
-    { 0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f },
-    { 0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
-    { 0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f },
-    { -0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f },
-    { -0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f }
-};
-
 void VoxelTestScreen::init(const char* name) {
     if (m_initialised) return;
     IScreen::init(name);
@@ -85,28 +34,6 @@ void VoxelTestScreen::init(const char* name) {
         }
     }
     m_chunkGrid.update();
-    
-    hg::MeshData3D<f32> vData = {};
-    vData.vertexCount = 6;
-    vData.indices = nullptr;
-    
-    vData.vertices = FRONT_QUAD;
-    m_frontVAO = hg::createVAO(vData);
-    
-    vData.vertices = BACK_QUAD;
-    m_backVAO = hg::createVAO(vData);
-    
-    vData.vertices = LEFT_QUAD;
-    m_leftVAO = hg::createVAO(vData);
-    
-    vData.vertices = RIGHT_QUAD;
-    m_rightVAO = hg::createVAO(vData);
-    
-    vData.vertices = BOTTOM_QUAD;
-    m_bottomVAO = hg::createVAO(vData);
-    
-    vData.vertices = TOP_QUAD;
-    m_topVAO = hg::createVAO(vData);
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glEnable(GL_DEPTH_TEST);
@@ -219,34 +146,14 @@ void VoxelTestScreen::draw(TimeData time) {
     for (i32 x = -VIEW_DIST; x <= VIEW_DIST; ++x) {
         for (i32 y = -VIEW_DIST; y <= VIEW_DIST; ++y) {
             for (i32 z = -VIEW_DIST; z <= VIEW_DIST; ++z) {
-                hvox::ChunkGridPosition pos = { x + m_chunkLoc.x, y + m_chunkLoc.y, z + m_chunkLoc.z };
-                hvox::Chunk* const chunk = m_chunkGrid.getChunks().at(pos);
+				hvox::ChunkGridPosition pos = { x + m_chunkLoc.x, y + m_chunkLoc.y, z + m_chunkLoc.z };
+				hvox::Chunk* const chunk = m_chunkGrid.getChunks().at(pos);
 
-                for (const hvox::Quad& quad : chunk->mesh.quads) {
-                    switch (quad.face) {
-                    case hvox::Face::TOP:
-                        glBindVertexArray(m_topVAO);
-                        break;
-                    case hvox::Face::BOTTOM:
-                        glBindVertexArray(m_bottomVAO);
-                        break;
-                    case hvox::Face::LEFT:
-                        glBindVertexArray(m_leftVAO);
-                        break;
-                    case hvox::Face::RIGHT:
-                        glBindVertexArray(m_rightVAO);
-                        break;
-                    case hvox::Face::FRONT:
-                        glBindVertexArray(m_frontVAO);
-                        break;
-                    case hvox::Face::BACK:
-                        glBindVertexArray(m_backVAO);
-                        break;
-                    }
-                    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &quad.translationMatrix[0][0]);
-                    glDrawArrays(GL_TRIANGLES, 0, 36);
-                    glBindVertexArray(0);
-                }
+				glBindVertexArray(chunk->mesh.vao);
+
+				glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &chunk->mesh.translationMatrix[0][0]);
+				glDrawArrays(GL_TRIANGLES, 0, 36);
+				glBindVertexArray(0);
             }
         }
     }

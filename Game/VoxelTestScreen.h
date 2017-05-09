@@ -33,18 +33,6 @@ private:
     GLuint m_texture2;
 
     hvox::ChunkGrid m_chunkGrid;
-
-    union {
-        GLuint m_quadVAOs[6];
-        struct {
-            GLuint m_frontVAO;
-            GLuint m_backVAO;
-            GLuint m_leftVAO;
-            GLuint m_rightVAO;
-            GLuint m_bottomVAO;
-            GLuint m_topVAO;
-        };
-    };
-
+	
     glm::f64vec3 m_chunkLoc = glm::f64vec3(0, 0, 0);
 };

@@ -2,6 +2,58 @@
 
 #include "voxel/Chunk.h"
 #include "voxel/ChunkMesher.h"
+#include "voxel/ChunkCoordSystems.h"
+
+// Won't need these once greedy merging is in, but for now let's just 
+// figure out simple occlusion. As such don't worry about indexing for now.
+static inline void addFrontQuad(hvox::BlockChunkPosition pos, hg::Vertex3D<f32>* vertexBuffer, ui64& vertexBufferSize) {
+	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
+	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
+	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x,  0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x,  0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x,  0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
+};
+static inline void addBackQuad(hvox::BlockChunkPosition pos, hg::Vertex3D<f32>* vertexBuffer, ui64& vertexBufferSize) {
+	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y, 0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
+	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, -0.5f + pos.y, 0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
+	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x,  0.5f + pos.y, 0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x,  0.5f + pos.y, 0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x,  0.5f + pos.y, 0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y, 0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
+};
+static inline void addLeftQuad(hvox::BlockChunkPosition pos, hg::Vertex3D<f32>* vertexBuffer, ui64& vertexBufferSize) {
+	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x,  0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
+	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x,  0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
+	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x,  0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
+};
+static inline void addRightQuad(hvox::BlockChunkPosition pos, hg::Vertex3D<f32>* vertexBuffer, ui64& vertexBufferSize) {
+	vertexBuffer[vertexBufferSize++] = { 0.5f + pos.x,  0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
+	vertexBuffer[vertexBufferSize++] = { 0.5f + pos.x,  0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+	vertexBuffer[vertexBufferSize++] = { 0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+	vertexBuffer[vertexBufferSize++] = { 0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+	vertexBuffer[vertexBufferSize++] = { 0.5f + pos.x, -0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
+	vertexBuffer[vertexBufferSize++] = { 0.5f + pos.x,  0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
+};
+static inline void addBottomQuad(hvox::BlockChunkPosition pos, hg::Vertex3D<f32>* vertexBuffer, ui64& vertexBufferSize) {
+	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, -0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
+	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, -0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
+	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
+	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+};
+static inline void addTopQuad(hvox::BlockChunkPosition pos, hg::Vertex3D<f32>* vertexBuffer, ui64& vertexBufferSize) {
+	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, 0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, 0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, 0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
+	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, 0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
+	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, 0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
+	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, 0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+};
 
 static inline bool isAtLeftFace(ui64 index, ui64 size) {
     return (index % size) == 0;
@@ -46,12 +98,17 @@ void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task, ui64 size) {
     //                We should not be iterating over all blocks in a chunk.
     //                Octree would make this more efficient, as would simply 
     //                storing a vector of "occupied" blocks.
-    Chunk& chunk = *task.chunk;
+    Chunk&                        chunk    = *task.chunk;
+	BlockRectilinearWorldPosition chunkPos = getRectilinearWorldPosition(chunk.pos, 0, size);
+
+	// Not a fan of this: lot's of copying and still newing stuff.
+	hg::Vertex3D<f32>* chunkMesh = new hg::Vertex3D<f32>[size * size * size * 6];
+	ui64               meshSize  = 0;
+
     for (ui64 i = 0; i < size * size * size; ++i) {
         Block voxel = chunk.blocks[i];
         if (voxel.present) {
-            BlockRectilinearWorldPosition blockPos = getRectilinearWorldPosition(chunk.pos, i, size);
-            glm::f32mat4 translationMatrix = glm::translate(glm::f32mat4(), glm::f32vec3(blockPos.x, blockPos.y, blockPos.z));
+            BlockChunkPosition blockPos = getBlockChunkPosition(i, size);
 
             // Check its neighbours, to decide whether to add its quads.
             // LEFT
@@ -59,12 +116,12 @@ void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task, ui64 size) {
                 // Get corresponding neighbour index in neighbour chunk and check.
                 ui64 j = getIndexAtRightFace(i, size);
                 if (chunk.neighbours.left == nullptr || !chunk.neighbours.left->blocks[j].present) {
-                    chunk.mesh.quads.push_back({ Face::LEFT, translationMatrix });
+					addLeftQuad(blockPos, chunkMesh, meshSize);
                 }
             } else {
                 // Get corresponding neighbour index in this chunk and check.
                 if (!chunk.blocks[i - 1].present) {
-                    chunk.mesh.quads.push_back({ Face::LEFT, translationMatrix });
+					addLeftQuad(blockPos, chunkMesh, meshSize);
                 }
             }
 
@@ -73,12 +130,12 @@ void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task, ui64 size) {
                 // Get corresponding neighbour index in neighbour chunk and check.
                 ui64 j = getIndexAtLeftFace(i, size);
                 if (chunk.neighbours.right == nullptr || !chunk.neighbours.right->blocks[j].present) {
-                    chunk.mesh.quads.push_back({ Face::RIGHT, translationMatrix });
+					addRightQuad(blockPos, chunkMesh, meshSize);
                 }
             } else {
                 // Get corresponding neighbour index in this chunk and check.
                 if (!chunk.blocks[i + 1].present) {
-                    chunk.mesh.quads.push_back({ Face::RIGHT, translationMatrix });
+					addRightQuad(blockPos, chunkMesh, meshSize);
                 }
             }
 
@@ -87,12 +144,12 @@ void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task, ui64 size) {
                 // Get corresponding neighbour index in neighbour chunk and check.
                 ui64 j = getIndexAtTopFace(i, size);
                 if (chunk.neighbours.bottom == nullptr || !chunk.neighbours.bottom->blocks[j].present) {
-                    chunk.mesh.quads.push_back({ Face::BOTTOM, translationMatrix });
+					addBottomQuad(blockPos, chunkMesh, meshSize);
                 }
             } else {
                 // Get corresponding neighbour index in this chunk and check.
                 if (!chunk.blocks[i - size].present) {
-                    chunk.mesh.quads.push_back({ Face::BOTTOM, translationMatrix });
+					addBottomQuad(blockPos, chunkMesh, meshSize);
                 }
             }
 
@@ -101,12 +158,12 @@ void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task, ui64 size) {
                 // Get corresponding neighbour index in neighbour chunk and check.
                 ui64 j = getIndexAtBottomFace(i, size);
                 if (chunk.neighbours.top == nullptr || !chunk.neighbours.top->blocks[j].present) {
-                    chunk.mesh.quads.push_back({ Face::TOP, translationMatrix });
+					addTopQuad(blockPos, chunkMesh, meshSize);
                 }
             } else {
                 // Get corresponding neighbour index in this chunk and check.
                 if (!chunk.blocks[i + size].present) {
-                    chunk.mesh.quads.push_back({ Face::TOP, translationMatrix });
+					addTopQuad(blockPos, chunkMesh, meshSize);
                 }
             }
 
@@ -115,12 +172,12 @@ void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task, ui64 size) {
                 // Get corresponding neighbour index in neighbour chunk and check.
                 ui64 j = getIndexAtBackFace(i, size);
                 if (chunk.neighbours.front == nullptr || !chunk.neighbours.front->blocks[j].present) {
-                    chunk.mesh.quads.push_back({ Face::FRONT, translationMatrix });
+					addFrontQuad(blockPos, chunkMesh, meshSize);
                 }
             } else {
                 // Get corresponding neighbour index in this chunk and check.
                 if (!chunk.blocks[i - (size * size)].present) {
-                    chunk.mesh.quads.push_back({ Face::FRONT, translationMatrix });
+					addFrontQuad(blockPos, chunkMesh, meshSize);
                 }
             }
 
@@ -129,14 +186,21 @@ void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task, ui64 size) {
                 // Get corresponding neighbour index in neighbour chunk and check.
                 ui64 j = getIndexAtFrontFace(i, size);
                 if (chunk.neighbours.back == nullptr || !chunk.neighbours.back->blocks[j].present) {
-                    chunk.mesh.quads.push_back({ Face::BACK, translationMatrix });
+					addBackQuad(blockPos, chunkMesh, meshSize);
                 }
             } else {
                 // Get corresponding neighbour index in this chunk and check.
                 if (!chunk.blocks[i + (size * size)].present) {
-                    chunk.mesh.quads.push_back({ Face::BACK, translationMatrix });
+					addBackQuad(blockPos, chunkMesh, meshSize);
                 }
             }
         }
     }
+	hg::MeshData3D<f32> mesh{};
+	mesh.vertexCount = meshSize;
+	mesh.vertices	 = chunkMesh;
+
+	glm::f32mat4 translationMatrix = glm::translate(glm::f32mat4(), glm::f32vec3(chunkPos.x, chunkPos.y, chunkPos.z));
+
+	chunk.mesh = { hg::createVAO(mesh), translationMatrix };
 }
