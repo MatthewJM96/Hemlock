@@ -10,14 +10,10 @@ namespace hemlock {
             FRONT,
             BACK
         };
-
-        struct Quad {
-            Face         face;
-            glm::f32mat4 translationMatrix;
-        };
-
+		
         struct ChunkMesh {
-            std::vector<Quad> quads;
+			GLuint vao;
+			glm::f32mat4 translationMatrix;
         };
     }
 }
