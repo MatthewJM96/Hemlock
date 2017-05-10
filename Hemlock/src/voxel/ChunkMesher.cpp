@@ -99,11 +99,11 @@ void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task, ui64 size) {
     //                Octree would make this more efficient, as would simply 
     //                storing a vector of "occupied" blocks.
     Chunk&                        chunk    = *task.chunk;
-	BlockRectilinearWorldPosition chunkPos = getRectilinearWorldPosition(chunk.pos, 0, size);
+    BlockRectilinearWorldPosition chunkPos = getRectilinearWorldPosition(chunk.pos, 0, size);
 
-	// Not a fan of this: lot's of copying and still newing stuff.
-	hg::Vertex3D<f32>* chunkMesh = new hg::Vertex3D<f32>[size * size * size * 6];
-	ui64               meshSize  = 0;
+    // Not a fan of this: lot's of copying and still newing stuff.
+    hg::Vertex3D<f32>* chunkMesh = new hg::Vertex3D<f32>[size * size * size * 6];
+    ui64               meshSize  = 0;
 
     for (ui64 i = 0; i < size * size * size; ++i) {
         Block voxel = chunk.blocks[i];
@@ -116,12 +116,12 @@ void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task, ui64 size) {
                 // Get corresponding neighbour index in neighbour chunk and check.
                 ui64 j = getIndexAtRightFace(i, size);
                 if (chunk.neighbours.left == nullptr || !chunk.neighbours.left->blocks[j].present) {
-					addLeftQuad(blockPos, chunkMesh, meshSize);
+                    addLeftQuad(blockPos, chunkMesh, meshSize);
                 }
             } else {
                 // Get corresponding neighbour index in this chunk and check.
                 if (!chunk.blocks[i - 1].present) {
-					addLeftQuad(blockPos, chunkMesh, meshSize);
+                    addLeftQuad(blockPos, chunkMesh, meshSize);
                 }
             }
 
@@ -130,12 +130,12 @@ void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task, ui64 size) {
                 // Get corresponding neighbour index in neighbour chunk and check.
                 ui64 j = getIndexAtLeftFace(i, size);
                 if (chunk.neighbours.right == nullptr || !chunk.neighbours.right->blocks[j].present) {
-					addRightQuad(blockPos, chunkMesh, meshSize);
+                    addRightQuad(blockPos, chunkMesh, meshSize);
                 }
             } else {
                 // Get corresponding neighbour index in this chunk and check.
                 if (!chunk.blocks[i + 1].present) {
-					addRightQuad(blockPos, chunkMesh, meshSize);
+                    addRightQuad(blockPos, chunkMesh, meshSize);
                 }
             }
 
@@ -144,12 +144,12 @@ void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task, ui64 size) {
                 // Get corresponding neighbour index in neighbour chunk and check.
                 ui64 j = getIndexAtTopFace(i, size);
                 if (chunk.neighbours.bottom == nullptr || !chunk.neighbours.bottom->blocks[j].present) {
-					addBottomQuad(blockPos, chunkMesh, meshSize);
+                    addBottomQuad(blockPos, chunkMesh, meshSize);
                 }
             } else {
                 // Get corresponding neighbour index in this chunk and check.
                 if (!chunk.blocks[i - size].present) {
-					addBottomQuad(blockPos, chunkMesh, meshSize);
+                    addBottomQuad(blockPos, chunkMesh, meshSize);
                 }
             }
 
@@ -158,12 +158,12 @@ void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task, ui64 size) {
                 // Get corresponding neighbour index in neighbour chunk and check.
                 ui64 j = getIndexAtBottomFace(i, size);
                 if (chunk.neighbours.top == nullptr || !chunk.neighbours.top->blocks[j].present) {
-					addTopQuad(blockPos, chunkMesh, meshSize);
+                    addTopQuad(blockPos, chunkMesh, meshSize);
                 }
             } else {
                 // Get corresponding neighbour index in this chunk and check.
                 if (!chunk.blocks[i + size].present) {
-					addTopQuad(blockPos, chunkMesh, meshSize);
+                    addTopQuad(blockPos, chunkMesh, meshSize);
                 }
             }
 
@@ -172,12 +172,12 @@ void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task, ui64 size) {
                 // Get corresponding neighbour index in neighbour chunk and check.
                 ui64 j = getIndexAtBackFace(i, size);
                 if (chunk.neighbours.front == nullptr || !chunk.neighbours.front->blocks[j].present) {
-					addFrontQuad(blockPos, chunkMesh, meshSize);
+                    addFrontQuad(blockPos, chunkMesh, meshSize);
                 }
             } else {
                 // Get corresponding neighbour index in this chunk and check.
                 if (!chunk.blocks[i - (size * size)].present) {
-					addFrontQuad(blockPos, chunkMesh, meshSize);
+                    addFrontQuad(blockPos, chunkMesh, meshSize);
                 }
             }
 
@@ -186,21 +186,21 @@ void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task, ui64 size) {
                 // Get corresponding neighbour index in neighbour chunk and check.
                 ui64 j = getIndexAtFrontFace(i, size);
                 if (chunk.neighbours.back == nullptr || !chunk.neighbours.back->blocks[j].present) {
-					addBackQuad(blockPos, chunkMesh, meshSize);
+                    addBackQuad(blockPos, chunkMesh, meshSize);
                 }
             } else {
                 // Get corresponding neighbour index in this chunk and check.
                 if (!chunk.blocks[i + (size * size)].present) {
-					addBackQuad(blockPos, chunkMesh, meshSize);
+                    addBackQuad(blockPos, chunkMesh, meshSize);
                 }
             }
         }
     }
-	hg::MeshData3D<f32> mesh{};
-	mesh.vertexCount = meshSize;
-	mesh.vertices	 = chunkMesh;
+    hg::MeshData3D<f32> mesh{};
+    mesh.vertexCount = meshSize;
+    mesh.vertices	 = chunkMesh;
 
-	glm::f32mat4 translationMatrix = glm::translate(glm::f32mat4(), glm::f32vec3(chunkPos.x, chunkPos.y, chunkPos.z));
+    glm::f32mat4 translationMatrix = glm::translate(glm::f32mat4(), glm::f32vec3(chunkPos.x, chunkPos.y, chunkPos.z));
 
-	chunk.mesh = { hg::createVAO(mesh), translationMatrix };
+    chunk.mesh = { hg::createVAO(mesh), translationMatrix };
 }
