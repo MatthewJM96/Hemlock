@@ -25,7 +25,7 @@ void VoxelTestScreen::init(const char* name) {
     m_texture1 = hg::Texture::load("textures/container.jpg", true);
     m_texture2 = hg::Texture::load("textures/anfo.png", true);
 
-    m_chunkGrid.init(CHUNK_SIZE, new ChunkGenerator(), new hvox::ChunkMesher());
+    m_chunkGrid.init(new ChunkGenerator(), new hvox::ChunkMesher());
     for (i32 x = -VIEW_DIST; x <= VIEW_DIST; ++x) {
         for (i32 y = -VIEW_DIST; y <= VIEW_DIST; ++y) {
             for (i32 z = -VIEW_DIST; z <= VIEW_DIST; ++z) {

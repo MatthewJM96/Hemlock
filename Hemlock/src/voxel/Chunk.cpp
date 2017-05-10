@@ -2,12 +2,11 @@
 
 #include "voxel/Chunk.h"
 
-void hvox::Chunk::init(ui16 size, ChunkGridPosition chunkPosition) {
-    m_size          = size;
+void hvox::Chunk::init(ChunkGridPosition chunkPosition) {
     pos = chunkPosition;
 
-    blocks = new Block[size * size * size];
-    std::fill_n(blocks, size * size * size, Block{ false });
+    blocks = new Block[CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE];
+    std::fill_n(blocks, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE, Block{ false });
 
     neighbours = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 }

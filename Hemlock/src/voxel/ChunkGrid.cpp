@@ -2,8 +2,7 @@
 
 #include "voxel/ChunkGrid.h"
 
-void hvox::ChunkGrid::init(ui16 size, IChunkGenerator* generator, ChunkMesher* mesher) {
-    m_size      = size;
+void hvox::ChunkGrid::init(ChunkGenerator* generator, ChunkMesher* mesher) {
     m_generator = generator;
     m_mesher    = mesher;
 }
@@ -52,7 +51,7 @@ void hvox::ChunkGrid::update() {
         m_genTasks.pop();
     }
     while (!m_meshTasks.empty()) {
-        m_mesher->runMeshTask(m_meshTasks.front(), m_size);
+        m_mesher->runMeshTask(m_meshTasks.front());
         m_meshTasks.pop();
     }
 }
@@ -81,7 +80,7 @@ void hvox::ChunkGrid::handleBulkBlockChange(h::Sender sender, BulkBlockChangeEve
 
 hvox::Chunk* hvox::ChunkGrid::createChunk(ChunkGridPosition pos) {
     Chunk* chunk = new Chunk();
-    chunk->init(m_size, pos);
+    chunk->init(pos);
     m_chunks[pos] = chunk;
 
     chunk->onBlockChange     += makeDelegate(this, &ChunkGrid::handleBlockChange);
