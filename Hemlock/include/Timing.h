@@ -10,6 +10,7 @@ namespace hemlock {
         f64 end();
 
         f64 getFrameTime() const { return m_frameTime; }
+        f64 getFPS()       const { return m_fps; }
     protected:
         f64 m_frameTime   = 0.0;
         f64 m_fps         = 0.0;

@@ -68,6 +68,13 @@ void happ::IApp::run() {
 
         m_window->sync();
         
+#if defined(OUTPUT_FPS)
+        static i32 i = 0;
+        if (i++ % 20 == 0) {
+            std::cout << "FPS: " << m_fpsLimiter->getFPS() << std::endl;
+        }
+#endif
+
         m_fpsLimiter->end();
     }
 }
