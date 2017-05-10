@@ -202,5 +202,5 @@ void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task, ui64 size) {
 
     glm::f32mat4 translationMatrix = glm::translate(glm::f32mat4(), glm::f32vec3(chunkPos.x, chunkPos.y, chunkPos.z));
 
-    chunk.mesh = { hg::createVAO(mesh), translationMatrix };
+    chunk.mesh = { hg::createVAO(mesh), meshSize, translationMatrix };
 }
