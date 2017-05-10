@@ -211,7 +211,7 @@
     <ClInclude Include="include\voxel\ChunkCoordSystems.h" />
     <ClInclude Include="include\voxel\ChunkMesh.hpp" />
     <ClInclude Include="include\voxel\ChunkMesher.h" />
-    <ClInclude Include="include\voxel\IChunkGenerator.hpp" />
+    <ClInclude Include="include\voxel\ChunkGenerator.h" />
     <ClInclude Include="include\voxel\ChunkGrid.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

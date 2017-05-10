@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Chunk.h"
-#include "IChunkGenerator.hpp"
+#include "ChunkGenerator.h"
 #include "ChunkMesher.h"
 
 namespace hemlock {
@@ -29,8 +29,8 @@ namespace hemlock {
         private:
             Chunk* createChunk(ChunkGridPosition pos);
             void establishChunkNeighbours(Chunk* chunk, ChunkGridPosition pos);
-
-            IChunkGenerator* m_generator;
+            
+            ChunkGenerator* m_generator;
             ChunkMesher*     m_mesher;
 
             GenTasks  m_genTasks;

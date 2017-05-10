@@ -1,9 +1,9 @@
 #pragma once
 
 #include <voxel/Chunk.h>
-#include <voxel/IChunkGenerator.hpp>
+#include <voxel/ChunkGeneratorBase.h>
 
-class ChunkGenerator : public hvox::IChunkGenerator {
+class ChunkGenerator : public hvox::ChunkGeneratorBase {
 public:
     void runGenTask(hvox::ChunkGenTask task) override;
 };
