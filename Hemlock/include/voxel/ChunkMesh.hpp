@@ -10,10 +10,11 @@ namespace hemlock {
             FRONT,
             BACK
         };
-		
+        
         struct ChunkMesh {
-			GLuint vao;
-			glm::f32mat4 translationMatrix;
+            GLuint       vao;
+            ui64         indices;
+            glm::f32mat4 translationMatrix;
         };
     }
 }

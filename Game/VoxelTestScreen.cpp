@@ -142,22 +142,23 @@ void VoxelTestScreen::draw(TimeData time) {
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, m_texture2);
     glUniform1i(m_shader.getUniformLocation("tex2"), 1);
-    
+	
     for (i32 x = -VIEW_DIST; x <= VIEW_DIST; ++x) {
         for (i32 y = -VIEW_DIST; y <= VIEW_DIST; ++y) {
             for (i32 z = -VIEW_DIST; z <= VIEW_DIST; ++z) {
 				hvox::ChunkGridPosition pos = { x + m_chunkLoc.x, y + m_chunkLoc.y, z + m_chunkLoc.z };
 				hvox::Chunk* const chunk = m_chunkGrid.getChunks().at(pos);
 
+				if (chunk->mesh.vao <= 0) continue;
+				
 				glBindVertexArray(chunk->mesh.vao);
-
+				
 				glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &chunk->mesh.translationMatrix[0][0]);
-				glDrawArrays(GL_TRIANGLES, 0, 36);
+				glDrawArrays(GL_TRIANGLES, 0, chunk->mesh.indices);
 				glBindVertexArray(0);
             }
         }
     }
-
 
     m_shader.unuse();
 }

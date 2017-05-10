@@ -7,52 +7,52 @@
 // Won't need these once greedy merging is in, but for now let's just 
 // figure out simple occlusion. As such don't worry about indexing for now.
 static inline void addFrontQuad(hvox::BlockChunkPosition pos, hg::Vertex3D<f32>* vertexBuffer, ui64& vertexBufferSize) {
-	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
-	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
-	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x,  0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
-	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x,  0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
-	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x,  0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
-	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
+    vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
+    vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
+    vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x,  0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+    vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x,  0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+    vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x,  0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+    vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
 };
 static inline void addBackQuad(hvox::BlockChunkPosition pos, hg::Vertex3D<f32>* vertexBuffer, ui64& vertexBufferSize) {
-	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y, 0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
-	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, -0.5f + pos.y, 0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
-	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x,  0.5f + pos.y, 0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
-	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x,  0.5f + pos.y, 0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
-	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x,  0.5f + pos.y, 0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
-	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y, 0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
+    vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
+    vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, -0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
+    vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x,  0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+    vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x,  0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+    vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x,  0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+    vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
 };
 static inline void addLeftQuad(hvox::BlockChunkPosition pos, hg::Vertex3D<f32>* vertexBuffer, ui64& vertexBufferSize) {
-	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x,  0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
-	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x,  0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
-	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
-	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
-	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
-	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x,  0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
+    vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x,  0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
+    vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x,  0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+    vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+    vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+    vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
+    vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x,  0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
 };
 static inline void addRightQuad(hvox::BlockChunkPosition pos, hg::Vertex3D<f32>* vertexBuffer, ui64& vertexBufferSize) {
-	vertexBuffer[vertexBufferSize++] = { 0.5f + pos.x,  0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
-	vertexBuffer[vertexBufferSize++] = { 0.5f + pos.x,  0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
-	vertexBuffer[vertexBufferSize++] = { 0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
-	vertexBuffer[vertexBufferSize++] = { 0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
-	vertexBuffer[vertexBufferSize++] = { 0.5f + pos.x, -0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
-	vertexBuffer[vertexBufferSize++] = { 0.5f + pos.x,  0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
+    vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x,  0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
+    vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x,  0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+    vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+    vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+    vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, -0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
+    vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x,  0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
 };
 static inline void addBottomQuad(hvox::BlockChunkPosition pos, hg::Vertex3D<f32>* vertexBuffer, ui64& vertexBufferSize) {
-	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
-	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
-	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, -0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
-	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, -0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
-	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
-	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+    vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+    vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+    vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, -0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
+    vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, -0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
+    vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
+    vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
 };
 static inline void addTopQuad(hvox::BlockChunkPosition pos, hg::Vertex3D<f32>* vertexBuffer, ui64& vertexBufferSize) {
-	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, 0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
-	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, 0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
-	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, 0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
-	vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x, 0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
-	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, 0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
-	vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x, 0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+    vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x,  0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+    vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x,  0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+    vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x,  0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
+    vertexBuffer[vertexBufferSize++] = {  0.5f + pos.x,  0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f };
+    vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x,  0.5f + pos.y,  0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f };
+    vertexBuffer[vertexBufferSize++] = { -0.5f + pos.x,  0.5f + pos.y, -0.5f + pos.z, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f };
 };
 
 static inline bool isAtLeftFace(ui64 index, ui64 size) {
