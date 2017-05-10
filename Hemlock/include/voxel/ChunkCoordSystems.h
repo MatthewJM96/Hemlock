@@ -35,12 +35,12 @@ namespace hemlock {
 
         bool operator==(const ChunkID& a, const ChunkID& b);
 
-        ui64 getBlockIndex(BlockChunkPosition pos, ui16 size = 32);
+        ui64 getBlockIndex(BlockChunkPosition pos);
 
-        BlockChunkPosition getBlockChunkPosition(ui64 blockIndex, ui16 size = 32);
+        BlockChunkPosition getBlockChunkPosition(ui64 blockIndex);
 
-        BlockRectilinearWorldPosition getRectilinearWorldPosition(ChunkGridPosition chunkPos, BlockChunkPosition blockPos = { 0, 0, 0 }, ui16 size = 32);
-        BlockRectilinearWorldPosition getRectilinearWorldPosition(ChunkGridPosition chunkPos, ui64 blockIndex, ui16 size = 32);
+        BlockRectilinearWorldPosition getRectilinearWorldPosition(ChunkGridPosition chunkPos, BlockChunkPosition blockPos = { 0, 0, 0 });
+        BlockRectilinearWorldPosition getRectilinearWorldPosition(ChunkGridPosition chunkPos, ui64 blockIndex);
     }
 }
 namespace hvox = hemlock::voxel;

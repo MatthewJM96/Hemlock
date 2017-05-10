@@ -11,7 +11,7 @@ namespace hemlock {
 
         class ChunkMesher {
         public:
-            void runMeshTask(ChunkMeshTask task, ui64 size);
+            void runMeshTask(ChunkMeshTask task);
         };
     }
 }

@@ -36,3 +36,7 @@
 
 #include "io/FileLoader.h"
 #include "Event.hpp"
+
+#if !defined(CHUNK_SIZE)
+#define CHUNK_SIZE 16
+#endif

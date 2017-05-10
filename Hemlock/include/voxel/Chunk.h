@@ -34,7 +34,7 @@ namespace hemlock {
                 blocks(nullptr), flags({ false/*, false*/ })
             { /* EMPTY */ }
 
-            void init(ui16 size, ChunkGridPosition chunkPosition);
+            void init(ChunkGridPosition chunkPosition);
             void dispose();
             
             // TODO(Matthew): Schedule chunk meshing task when blocks are set.
@@ -63,9 +63,6 @@ namespace hemlock {
                 //bool hasGenTask  : 1;
                 bool hasMeshTask : 1;
             } flags;
-        private:
-
-            ui16 m_size;
         };
     }
 }

@@ -4,8 +4,7 @@
 
 #include <procedural/Noise.hpp>
 
-void ChunkGenerator::runGenTask(hvox::ChunkGenTask task, ui16 size) {
-
+void ChunkGenerator::runGenTask(hvox::ChunkGenTask task) {
     // Set up noise data for small, medium and large-scale terrain details.
     hproc::Noise::NoiseData<f64> smallDetails;
     smallDetails.type = hproc::Noise::Type::ABS;
@@ -55,10 +54,10 @@ void ChunkGenerator::runGenTask(hvox::ChunkGenTask task, ui16 size) {
     // TODO(Matthew): Multi-stage generation for heightmap, ore, water bodies (?), caves, etc.
 
     hvox::Chunk& chunk = *task.chunk;
-    hvox::BlockRectilinearWorldPosition chunkBlockPos = hvox::getRectilinearWorldPosition(chunk.pos, 0, size);
+    hvox::BlockRectilinearWorldPosition chunkBlockPos = hvox::getRectilinearWorldPosition(chunk.pos, 0);
     // Iterate over the x-z plane, generating terrain for each point. (Right now just 2D noise).
-    for (i64 x = 0; x < size; ++x) {
-        for (i64 z = 0; z < size; ++z) {
+    for (i64 x = 0; x < CHUNK_SIZE; ++x) {
+        for (i64 z = 0; z < CHUNK_SIZE; ++z) {
             // Get position of column of chunk.
 			glm::f64vec2 pos = { chunkBlockPos.x + x, chunkBlockPos.z + z };
             // Calculate height of this column, taking off y-position of the base of this chunk to get relative height.
@@ -67,7 +66,7 @@ void ChunkGenerator::runGenTask(hvox::ChunkGenTask task, ui16 size) {
             // If the relative height is <= 0 then we can just go to the next column - nothing exists in it for this chunk.
             if (yMax <= 0) continue;
             // Set each block in this column up-to the relative height generated or the height of the chunk, whichever is smaller.
-            for (i64 y = 0; y < yMax && y < size; ++y) {
+            for (i64 y = 0; y < yMax && y < CHUNK_SIZE; ++y) {
                 chunk.setBlock({ (ui16)x, (ui16)y, (ui16)z }, { true });
             }
         }

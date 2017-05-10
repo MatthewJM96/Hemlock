@@ -5,5 +5,5 @@
 
 class ChunkGenerator : public hvox::IChunkGenerator {
 public:
-    void runGenTask(hvox::ChunkGenTask task, ui16 size);
+    void runGenTask(hvox::ChunkGenTask task) override;
 };
