@@ -34,7 +34,8 @@ hg::WindowError hg::Window::init() {
         return WindowError::GLEW_INITIALISATION;
     }
 
-    printf("*** OpenGL Version: %s ***\n", glGetString(GL_VERSION));
+    printf("*** OpenGL Version:  %s ***\n", glGetString(GL_VERSION));
+    printf("*** OpenGL Renderer: %s ***\n", glGetString(GL_RENDERER));
 
     GLint nrAttributes;
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
