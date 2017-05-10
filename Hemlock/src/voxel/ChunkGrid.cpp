@@ -31,7 +31,24 @@ void hvox::ChunkGrid::submitGenTask(ChunkLOD lod, ChunkGenType type, ChunkGridPo
 
 void hvox::ChunkGrid::update() {
     while (!m_genTasks.empty()) {
-        m_generator->runGenTask(m_genTasks.front(), m_size);
+        ChunkGenTask& chunkGenTask = m_genTasks.front();
+
+        // Mark a gen task as active: this will stop the chunk triggering block change events.
+        chunkGenTask.chunk->flags.genTaskActive = true;
+
+        m_generator->runGenTask(chunkGenTask);
+
+        // Reenable the triggering of block change events.
+        chunkGenTask.chunk->flags.genTaskActive = false;
+
+        // Add a mesh task for this chunk.
+        if (!chunkGenTask.chunk->flags.hasMeshTask) {
+            m_meshTasks.push(ChunkMeshTask{
+                chunkGenTask.chunk
+            });
+            chunkGenTask.chunk->flags.hasMeshTask = true;
+        }
+
         m_genTasks.pop();
     }
     while (!m_meshTasks.empty()) {
@@ -42,8 +59,7 @@ void hvox::ChunkGrid::update() {
 
 void hvox::ChunkGrid::handleBlockChange(h::Sender sender, BlockChangeEvent event) {
     Chunk* chunk = (Chunk*)sender;
-
-    // TODO(Matthew): It would be better to not have to go through entire event/delegate system just to reject adding the majority of tasks.
+    
     if (!chunk->flags.hasMeshTask) {
         m_meshTasks.push(ChunkMeshTask{
             chunk
@@ -55,7 +71,6 @@ void hvox::ChunkGrid::handleBlockChange(h::Sender sender, BlockChangeEvent event
 void hvox::ChunkGrid::handleBulkBlockChange(h::Sender sender, BulkBlockChangeEvent event) {
     Chunk* chunk = (Chunk*)sender;
 
-    // TODO(Matthew): It would be better to not have to go through entire event/delegate system just to reject adding the majority of tasks.
     if (!chunk->flags.hasMeshTask) {
         m_meshTasks.push(ChunkMeshTask{
             chunk

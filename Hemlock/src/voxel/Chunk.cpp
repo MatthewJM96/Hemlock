@@ -20,11 +20,15 @@ void hvox::Chunk::dispose() {
 }
 
 void hvox::Chunk::setBlock(BlockChunkPosition blockPos, Block block) {
-    blocks[getBlockIndex(blockPos, m_size)] = block;
-    onBlockChange({ block.present ? BlockChange::PLACE : BlockChange::DESTROY, blockPos, pos });
+    blocks[getBlockIndex(blockPos)] = block;
+    if (!flags.genTaskActive) {
+        onBlockChange({ block.present ? BlockChange::PLACE : BlockChange::DESTROY, blockPos, pos });
+    }
 }
 
 void hvox::Chunk::setContiguousBlocks(BlockChunkPosition start, ui32 count, Block* blocks) {
-    std::memcpy(&blocks[getBlockIndex(start, m_size)], blocks, count);
-    onBulkBlockChange({ blocks, start, count, pos });
+    std::memcpy(&blocks[getBlockIndex(start)], blocks, count);
+    if (!flags.genTaskActive) {
+        onBulkBlockChange({ blocks, start, count, pos });
+    }
 }

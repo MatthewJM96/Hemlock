@@ -31,7 +31,7 @@ namespace hemlock {
         public:
             Chunk() :
                 neighbours({ nullptr, nullptr, nullptr, nullptr, nullptr, nullptr }),
-                blocks(nullptr), flags({ false/*, false*/ })
+                blocks(nullptr), flags({ false, false })
             { /* EMPTY */ }
 
             void init(ChunkGridPosition chunkPosition);
@@ -60,8 +60,8 @@ namespace hemlock {
             Event<BulkBlockChangeEvent> onBulkBlockChange = Event<BulkBlockChangeEvent>(this);
 
             struct {
-                //bool hasGenTask  : 1;
-                bool hasMeshTask : 1;
+                bool genTaskActive : 1;
+                bool hasMeshTask   : 1;
             } flags;
         };
     }
