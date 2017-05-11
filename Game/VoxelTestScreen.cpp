@@ -4,8 +4,58 @@
 
 #include <graphics/Mesh.hpp>
 #include <graphics/Texture.h>
+#include <procedural/Noise.hpp>
+#include <voxel/ChunkGenerator.h>
 
-#include "ChunkGenerator.h"
+static i32 generateHeightmap(hvox::ColumnRectilinearWorldPosition pos) {
+    // Set up noise data for small, medium and large-scale terrain details.
+    hproc::Noise::NoiseData<f64> smallDetails;
+    smallDetails.type = hproc::Noise::Type::ABS;
+    smallDetails.octaves = 8;
+    smallDetails.persistence = 0.85;
+    smallDetails.frequency = 0.05;
+    smallDetails.modifier = 0.0;
+    smallDetails.op = hproc::Noise::Operation::ADD;
+    smallDetails.multiplier = hproc::Noise::Multiplier::NONE;
+    smallDetails.bound = { -2.0, 7.0 };
+    smallDetails.clamp = { 0.0,  0.0 };
+
+    hproc::Noise::NoiseData<f64> medDetails;
+    medDetails.type = hproc::Noise::Type::CELLULAR_CUBIC;
+    medDetails.octaves = 6;
+    medDetails.persistence = 0.8;
+    medDetails.frequency = 0.0025;
+    medDetails.modifier = 1.0;
+    medDetails.op = hproc::Noise::Operation::ADD;
+    medDetails.multiplier = hproc::Noise::Multiplier::NONE;
+    medDetails.bound = { -10.0, 10.0 };
+    medDetails.clamp = { 0.0,  0.0 };
+
+    hproc::Noise::NoiseData<f64> medDetails2;
+    medDetails2.type = hproc::Noise::Type::RIDGED;
+    medDetails2.octaves = 6;
+    medDetails2.persistence = 0.8;
+    medDetails2.frequency = 0.0025;
+    medDetails2.modifier = 1.0;
+    medDetails2.op = hproc::Noise::Operation::ADD;
+    medDetails2.multiplier = hproc::Noise::Multiplier::NONE;
+    medDetails2.bound = { -20.0, 10.0 };
+    medDetails2.clamp = { 0.0,  0.0 };
+
+    hproc::Noise::NoiseData<f64> bigDetails;
+    bigDetails.type = hproc::Noise::Type::RIDGED;
+    bigDetails.octaves = 6;
+    bigDetails.persistence = 0.7;
+    bigDetails.frequency = 0.0005;
+    bigDetails.modifier = 1.0;
+    bigDetails.op = hproc::Noise::Operation::ADD;
+    bigDetails.multiplier = hproc::Noise::Multiplier::NONE;
+    bigDetails.bound = { -30.0, 250.0 };
+    bigDetails.clamp = { 0.0,  0.0 };
+
+    glm::f64vec2 pos_ = { pos.x, pos.z };
+    return (i32)glm::floor(hproc::Noise::getNoiseValue(pos_, smallDetails) + hproc::Noise::getNoiseValue(pos_, medDetails) + hproc::Noise::getNoiseValue(pos_, medDetails2) + hproc::Noise::getNoiseValue(pos_, bigDetails));
+}
 
 void VoxelTestScreen::init(const char* name) {
     if (m_initialised) return;
@@ -24,12 +74,13 @@ void VoxelTestScreen::init(const char* name) {
 
     m_texture1 = hg::Texture::load("textures/container.jpg", true);
     m_texture2 = hg::Texture::load("textures/anfo.png", true);
-
-    m_chunkGrid.init(new ChunkGenerator(), new hvox::ChunkMesher());
-    for (i32 x = -VIEW_DIST; x <= VIEW_DIST; ++x) {
-        for (i32 y = -VIEW_DIST; y <= VIEW_DIST; ++y) {
-            for (i32 z = -VIEW_DIST; z <= VIEW_DIST; ++z) {
-                m_chunkGrid.submitGenTask(hvox::ChunkLOD::FULL, hvox::ChunkGenType::TERRAIN, { x, y, z });
+    
+    m_chunkGrid.init(new hvox::ChunkGenerator(), new hvox::ChunkMesher());
+    auto heightmapper = h::makeDelegate(&generateHeightmap);
+    for (i32 x = -VIEW_DIST_XZ; x <= VIEW_DIST_XZ; ++x) {
+        for (i32 y = -VIEW_DIST_Y; y <= VIEW_DIST_Y; ++y) {
+            for (i32 z = -VIEW_DIST_XZ; z <= VIEW_DIST_XZ; ++z) {
+                m_chunkGrid.submitGenTask(hvox::ChunkLOD::FULL, hvox::ChunkGenType::TERRAIN, { x, y, z }, heightmapper);
             }
         }
     }
@@ -77,32 +128,34 @@ void VoxelTestScreen::update(TimeData time) {
 
     bool runGridUpdate = false;
 
+    auto heightmapper = h::makeDelegate(&generateHeightmap);
+
     f64 xDel = glm::round(pos.x - m_chunkLoc.x);
     if (xDel != 0.0) {
-        i32 x = xDel * VIEW_DIST;
-        for (i32 y = -VIEW_DIST; y <= VIEW_DIST; ++y) {
-            for (i32 z = -VIEW_DIST; z <= VIEW_DIST; ++z) {
-                m_chunkGrid.submitGenTask(hvox::ChunkLOD::FULL, hvox::ChunkGenType::TERRAIN, { x + (i32)pos.x, y + (i32)pos.y, z + (i32)pos.z });
+        i32 x = xDel * VIEW_DIST_XZ;
+        for (i32 y = -VIEW_DIST_Y; y <= VIEW_DIST_Y; ++y) {
+            for (i32 z = -VIEW_DIST_XZ; z <= VIEW_DIST_XZ; ++z) {
+                m_chunkGrid.submitGenTask(hvox::ChunkLOD::FULL, hvox::ChunkGenType::TERRAIN, { x + (i32)pos.x, y + (i32)pos.y, z + (i32)pos.z }, heightmapper);
             }
         }
         runGridUpdate = true;
     }
     f64 yDel = glm::round(pos.y - m_chunkLoc.y);
     if (yDel != 0.0) {
-        i32 y = yDel * VIEW_DIST;
-        for (i32 x = -VIEW_DIST; x <= VIEW_DIST; ++x) {
-            for (i32 z = -VIEW_DIST; z <= VIEW_DIST; ++z) {
-                m_chunkGrid.submitGenTask(hvox::ChunkLOD::FULL, hvox::ChunkGenType::TERRAIN, { x + (i32)pos.x, y + (i32)pos.y, z + (i32)pos.z });
+        i32 y = yDel * VIEW_DIST_Y;
+        for (i32 x = -VIEW_DIST_XZ; x <= VIEW_DIST_XZ; ++x) {
+            for (i32 z = -VIEW_DIST_XZ; z <= VIEW_DIST_XZ; ++z) {
+                m_chunkGrid.submitGenTask(hvox::ChunkLOD::FULL, hvox::ChunkGenType::TERRAIN, { x + (i32)pos.x, y + (i32)pos.y, z + (i32)pos.z }, heightmapper);
             }
         }
         runGridUpdate = true;
     }
     f64 zDel = glm::round(pos.z - m_chunkLoc.z);
     if (zDel != 0.0) {
-        i32 z = zDel * VIEW_DIST;
-        for (i32 x = -VIEW_DIST; x <= VIEW_DIST; ++x) {
-            for (i32 y = -VIEW_DIST; y <= VIEW_DIST; ++y) {
-                m_chunkGrid.submitGenTask(hvox::ChunkLOD::FULL, hvox::ChunkGenType::TERRAIN, { x + (i32)pos.x, y + (i32)pos.y, z + (i32)pos.z });
+        i32 z = zDel * VIEW_DIST_XZ;
+        for (i32 x = -VIEW_DIST_XZ; x <= VIEW_DIST_XZ; ++x) {
+            for (i32 y = -VIEW_DIST_Y; y <= VIEW_DIST_Y; ++y) {
+                m_chunkGrid.submitGenTask(hvox::ChunkLOD::FULL, hvox::ChunkGenType::TERRAIN, { x + (i32)pos.x, y + (i32)pos.y, z + (i32)pos.z }, heightmapper);
             }
         }
         runGridUpdate = true;
@@ -143,9 +196,9 @@ void VoxelTestScreen::draw(TimeData time) {
     glBindTexture(GL_TEXTURE_2D, m_texture2);
     glUniform1i(m_shader.getUniformLocation("tex2"), 1);
 	
-    for (i32 x = -VIEW_DIST; x <= VIEW_DIST; ++x) {
-        for (i32 y = -VIEW_DIST; y <= VIEW_DIST; ++y) {
-            for (i32 z = -VIEW_DIST; z <= VIEW_DIST; ++z) {
+    for (i32 x = -VIEW_DIST_XZ; x <= VIEW_DIST_XZ; ++x) {
+        for (i32 y = -VIEW_DIST_Y; y <= VIEW_DIST_Y; ++y) {
+            for (i32 z = -VIEW_DIST_XZ; z <= VIEW_DIST_XZ; ++z) {
 				hvox::ChunkGridPosition pos = { x + m_chunkLoc.x, y + m_chunkLoc.y, z + m_chunkLoc.z };
 				hvox::Chunk* const chunk = m_chunkGrid.getChunks().at(pos);
 
