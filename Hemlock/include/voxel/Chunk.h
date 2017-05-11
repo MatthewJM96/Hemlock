@@ -1,7 +1,7 @@
 #pragma once
 
 #include "voxel/ChunkMesh.hpp"
-#include "voxel/ChunkCoordSystems.h"
+#include "voxel/ChunkCoordSystems.hpp"
 
 namespace hemlock {
     namespace voxel {

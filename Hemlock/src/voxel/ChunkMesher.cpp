@@ -2,7 +2,7 @@
 
 #include "voxel/Chunk.h"
 #include "voxel/ChunkMesher.h"
-#include "voxel/ChunkCoordSystems.h"
+#include "voxel/ChunkCoordSystems.hpp"
 
 // Won't need these once greedy merging is in, but for now let's just 
 // figure out simple occlusion. As such don't worry about indexing for now.
@@ -102,8 +102,8 @@ void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task) {
     BlockRectilinearWorldPosition chunkPos = getRectilinearWorldPosition(chunk.pos, 0);
 
     // Not a fan of this: lot's of copying and still newing stuff.
-    hg::Vertex3D<f32> chunkMesh[CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE * 6];
-    ui64              meshSize  = 0;
+    hg::Vertex3D<f32>* chunkMesh = new hg::Vertex3D<f32>[CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE * 6];
+    ui64               meshSize  = 0;
 
     for (ui64 i = 0; i < CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE; ++i) {
         Block voxel = chunk.blocks[i];
@@ -203,4 +203,6 @@ void hvox::ChunkMesher::runMeshTask(ChunkMeshTask task) {
     glm::f32mat4 translationMatrix = glm::translate(glm::f32mat4(), glm::f32vec3(chunkPos.x, chunkPos.y, chunkPos.z));
 
     chunk.mesh = { hg::createVAO(mesh), meshSize, translationMatrix };
+
+    delete[] chunkMesh;
 }
