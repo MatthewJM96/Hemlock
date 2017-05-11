@@ -2,6 +2,7 @@
 
 #include "voxel/ChunkGrid.h"
 
+// TODO(Matthew): Do we need this. If the generator & mesher are well designed they could be data-driven hence no need for multiple instances.
 void hvox::ChunkGrid::init(ChunkGenerator* generator, ChunkMesher* mesher) {
     m_generator = generator;
     m_mesher    = mesher;
@@ -17,7 +18,7 @@ void hvox::ChunkGrid::dispose() {
     Chunks().swap(m_chunks);
 }
 
-void hvox::ChunkGrid::submitGenTask(ChunkLOD lod, ChunkGenType type, ChunkGridPosition pos) {
+void hvox::ChunkGrid::submitGenTask(ChunkLOD lod, ChunkGenType type, ChunkGridPosition pos, Heightmapper heightmapper) {
     auto it = m_chunks.find(pos);
     Chunk* chunk = nullptr;
     if (it == m_chunks.end()) {
@@ -25,17 +26,18 @@ void hvox::ChunkGrid::submitGenTask(ChunkLOD lod, ChunkGenType type, ChunkGridPo
     } else {
         chunk = (*it).second;
     }
-    m_genTasks.push({ lod, type, chunk });
+    m_genTasks.push({ lod, type, chunk, heightmapper });
 }
 
 void hvox::ChunkGrid::update() {
+    GenCache cache;
     while (!m_genTasks.empty()) {
         ChunkGenTask& chunkGenTask = m_genTasks.front();
 
         // Mark a gen task as active: this will stop the chunk triggering block change events.
         chunkGenTask.chunk->flags.genTaskActive = true;
 
-        m_generator->runGenTask(chunkGenTask);
+        m_generator->runGenTask(chunkGenTask, cache);
 
         // Reenable the triggering of block change events.
         chunkGenTask.chunk->flags.genTaskActive = false;
@@ -50,6 +52,9 @@ void hvox::ChunkGrid::update() {
 
         m_genTasks.pop();
     }
+    // TODO(Matthew): This may not be the most appropriate way to handle eviction in the cache.
+    GenCache().swap(cache);
+
     while (!m_meshTasks.empty()) {
         m_mesher->runMeshTask(m_meshTasks.front());
         m_meshTasks.pop();

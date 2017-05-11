@@ -163,6 +163,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ChunkGenerator.cpp" />
     <ClCompile Include="src\app\IApp.cpp" />
     <ClCompile Include="src\camera\BasicCamera.cpp" />
     <ClCompile Include="src\camera\BasicFPSCamera.cpp" />
@@ -179,7 +180,6 @@
     <ClCompile Include="src\ui\InputDispatcher.cpp" />
     <ClCompile Include="src\ui\InputManager.cpp" />
     <ClCompile Include="src\voxel\Chunk.cpp" />
-    <ClCompile Include="src\voxel\ChunkCoordSystems.cpp" />
     <ClCompile Include="src\voxel\ChunkGrid.cpp" />
     <ClCompile Include="src\voxel\ChunkMesher.cpp" />
   </ItemGroup>
@@ -208,7 +208,7 @@
     <ClInclude Include="include\ui\InputManager.h" />
     <ClInclude Include="include\ui\Keys.hpp" />
     <ClInclude Include="include\voxel\Chunk.h" />
-    <ClInclude Include="include\voxel\ChunkCoordSystems.h" />
+    <ClInclude Include="include\voxel\ChunkCoordSystems.hpp" />
     <ClInclude Include="include\voxel\ChunkMesh.hpp" />
     <ClInclude Include="include\voxel\ChunkMesher.h" />
     <ClInclude Include="include\voxel\ChunkGenerator.h" />

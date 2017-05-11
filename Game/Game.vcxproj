@@ -155,14 +155,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
-    <ClCompile Include="ChunkGenerator.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="MainMenuScreen.cpp" />
     <ClCompile Include="VoxelTestScreen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
-    <ClInclude Include="ChunkGenerator.h" />
     <ClInclude Include="Constants.hpp" />
     <ClInclude Include="MainMenuScreen.h" />
     <ClInclude Include="stdafx.h" />

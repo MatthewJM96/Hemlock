@@ -18,7 +18,7 @@ namespace hemlock {
             void init(ChunkGenerator* generator, ChunkMesher* mesher);
             void dispose();
 
-            void submitGenTask(ChunkLOD lod, ChunkGenType type, ChunkGridPosition pos);
+            void submitGenTask(ChunkLOD lod, ChunkGenType type, ChunkGridPosition pos, Heightmapper heightmapper);
 
             void update();
 

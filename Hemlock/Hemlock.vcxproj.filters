@@ -78,9 +78,6 @@
     <ClCompile Include="src\voxel\Chunk.cpp">
       <Filter>Source Files\Voxel</Filter>
     </ClCompile>
-    <ClCompile Include="src\voxel\ChunkCoordSystems.cpp">
-      <Filter>Source Files\Voxel</Filter>
-    </ClCompile>
     <ClCompile Include="src\io\FileLoader.cpp">
       <Filter>Source Files\IO</Filter>
     </ClCompile>
@@ -108,6 +105,9 @@
     <ClCompile Include="src\ui\InputManager.cpp">
       <Filter>Source Files\UI</Filter>
     </ClCompile>
+    <ClCompile Include="ChunkGenerator.cpp">
+      <Filter>Source Files\Voxel</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\stdafx.h">
@@ -132,9 +132,6 @@
       <Filter>Header Files\Camera</Filter>
     </ClInclude>
     <ClInclude Include="include\voxel\Chunk.h">
-      <Filter>Header Files\Voxel</Filter>
-    </ClInclude>
-    <ClInclude Include="include\voxel\ChunkCoordSystems.h">
       <Filter>Header Files\Voxel</Filter>
     </ClInclude>
     <ClInclude Include="include\voxel\ChunkGrid.h">
@@ -195,6 +192,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\voxel\ChunkGenerator.h">
+      <Filter>Header Files\Voxel</Filter>
+    </ClInclude>
+    <ClInclude Include="include\voxel\ChunkCoordSystems.hpp">
       <Filter>Header Files\Voxel</Filter>
     </ClInclude>
   </ItemGroup>
