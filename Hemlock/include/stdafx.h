@@ -38,5 +38,5 @@
 #include "Event.hpp"
 
 #if !defined(CHUNK_SIZE)
-#define CHUNK_SIZE 16
+#define CHUNK_SIZE 32
 #endif
